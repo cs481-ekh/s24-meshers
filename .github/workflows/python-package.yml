@@ -1,13 +1,10 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Python package
 
 on:
   push:
-    branches: [ "pypackage_task26_a" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "pypackage_task26_a" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -28,11 +25,13 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Add 'src' to PYTHONPATH
+      run: echo "PYTHONPATH=\$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
     - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
+    - name: Test with pytest (run test_module1.py)
       run: |
         pytest ./test/test_sample.py
       shell: bash
