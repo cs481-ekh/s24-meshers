@@ -1,5 +1,5 @@
 import pytest
-from pymgm.src import sample
+from src.pymgm_test import sample
 
 
 def test_add_punct():
