@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymgm"
+version = "0.1.0"
+description = "An open source python package for implementing the MGM method for elliptic equations on point cloud surfaces"
+authors = [
+  {name = "Grady Wright", email = "gradywright@boisestat.edu"}
+]
+license = "MIT"
+readme = "README.md"
+keywords = ["MGM", "elliptic equations", "point cloud"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
