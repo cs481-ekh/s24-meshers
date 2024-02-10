@@ -37,3 +37,6 @@ jobs:
         export PYTHONPATH=./pymgm:$PYTHONPATH
         pytest ./pymgm/test/
       shell: bash
+    - name: Build the package
+      run: |
+        python -m build
