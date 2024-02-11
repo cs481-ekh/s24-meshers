@@ -23,9 +23,6 @@ jobs:
         pip uninstall bump2version -y || true  # Ignore errors if not installed
         pip install bumpversion build twine
 
-    - name: Get current version
-      run: bumpversion --current-version `grep 'version =' pyproject.toml | sed 's/version = //g' | tr -d '"'` --dry-run --verbose patch
-
     - name: Bump patch version
       run: bumpversion --verbose patch
 
