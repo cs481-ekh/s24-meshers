@@ -23,7 +23,7 @@ jobs:
         pip install bumpversion build twine
 
     - name: Bump patch version
-      run: bumpversion patch
+      run: bumpversion --config-file bumpversion.cfg patch
 
     - name: Build Package
       run: |
