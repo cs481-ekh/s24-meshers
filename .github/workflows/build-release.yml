@@ -30,9 +30,16 @@ jobs:
     - name: Bump patch version
       run: bumpversion --verbose patch
 
+
     - name: Build Package
       run: |
         ./build.sh
+
+    - name: Commit and push version bump
+      run: |
+        git add pyproject.toml .bumpversion.cfg
+        git commit -m "Bump version"
+        git push
 
     - name: Publish Package
       env:
