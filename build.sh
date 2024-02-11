@@ -19,6 +19,4 @@ echo "Building Python package using pyproject.toml..."
 # Build the package
 "$pyname" -m build
 
-echo -e "\rPackage built successfully."
-
 exit 0
