@@ -6,10 +6,10 @@ set -e
 echo "Building Python package using pyproject.toml..."
 
 # Ensure the build module is installed
-python -m pip install --upgrade build
+python3 -m pip install --upgrade build
 
 # Build the package
-python -m build
+python3 -m build
 
 echo "\rPackage built successfully."
 
