@@ -22,6 +22,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install bumpversion build twine
 
+    # I wasn't able to find a way to override our current branch protection
+    # but essentially that is the issue why automation is unable to update the version number 
+    # each time
+
     #- name: Configure Git user
     #  run: |
     #    git config --local user.email "action@github.com"
