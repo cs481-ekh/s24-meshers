@@ -2,8 +2,8 @@ name: Build and Publish
 
 on:
   push:
-    branches: [ "task40" ]  # This should be the branch you merge into
-
+    branches: [ "main" ] 
+    
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
