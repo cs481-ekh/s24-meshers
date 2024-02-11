@@ -35,3 +35,6 @@ jobs:
     - name: Run lint and tests
       run: ./test.sh
       shell: bash
+    - name: Build Python Package
+      run: ./build.sh
+      shell: bash
