@@ -30,11 +30,10 @@ jobs:
     - name: Bump patch version
       run: bumpversion --verbose patch
 
-    - name: Commit and push version bump
+    - name: Push changes
       run: |
-        git add pyproject.toml .bumpversion.cfg
-        git commit -m "Bump version"
         git push
+        git push --tags
 
     - name: Build Package
       run: |
