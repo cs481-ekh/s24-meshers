@@ -1,6 +1,5 @@
 import pytest
-from src import sample
-
+from src.pymgm_test import sample
 
 def test_add_punct():
     assert sample.add_punct("Jump", "exclaimation")=="Jump!"
