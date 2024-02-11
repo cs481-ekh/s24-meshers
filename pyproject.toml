@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymgm-test"
-version = "0.1.2"
+version = "0.1.3"
 description = "An open source python package for implementing the MGM method for elliptic equations on point cloud surfaces"
 authors = [
   {name = "Grady Wright", email = "gradywright@boisestate.edu"}
