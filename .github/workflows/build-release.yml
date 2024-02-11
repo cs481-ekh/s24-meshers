@@ -32,10 +32,10 @@ jobs:
 
     - name: Push changes
       run: |
-        git push --quiet https://${{ secrets.PUBLISH_BRANCH }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
-        git push --tags --quiet https://${{ secrets.PUBLISH_BRANCH }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+        git push --quiet https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+        git push --tags --quiet https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
       env:
-        GH_PAT: ${{ secrets.PUBLISH_BRANCH }}
+        GH_PAT: ${{ secrets.GH_PAT }}
 
     - name: Build Package
       run: |
