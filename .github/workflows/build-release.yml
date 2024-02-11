@@ -20,8 +20,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip uninstall bump2version -y || true  # Ignore errors if not installed
         pip install bumpversion build twine
+
+    - name: Configure Git user
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"  
 
     - name: Bump patch version
       run: bumpversion --verbose patch
