@@ -1,0 +1,210 @@
+@startuml
+
+abstract class mgm_m {
+    +solve()
+    +afun()
+	+afuncon()
+	+standalone()
+	+standalonecon()
+	+multilevelcon()
+	+multilevel()
+}
+
+class mgm2D_m {
+	Lh
+	x
+	domArea
+	hasConstNullspace
+	stencilSizeT
+	polyDegT
+	transferOp
+	verbose
+	obj mgm2d LevelsData < interpolator<> , restrictor<> , PointClouds<> > 
+	nLevels
+    +mgm2d_constructor()
+	+buildInterpOp()
+}
+
+class gallery_m {
+	Lh
+	x
+	domVol
+	fh
+	uexact
+}
+
+class DriverScript_m {
+
+}
+
+class solve_m {
+    LevelsData
+	fh
+	uh	//solution
+	relres //residual
+	iters //iterations
+	smooth <>
+	matvecOp // mgm afun operator
+	mgmMethod // mgm standalone
+	mgmOp  // mgm multilevel
+	accelerator // gmres or bicg
+}
+
+class constructor_m {
+	polyDim
+	minStencil
+	StencilSize
+	Npoints
+	nLevels
+	domainArea
+	runTime
+	LevelsData struct 
+    +constructor()
+
+}
+
+class PcCoarsen2D_cpp {
+	vector < Point2d > inputPoints
+	WeightedSampleElimination object
+	outputpoints = wse.Eliminate
+	Nc = outputPoints.size
+	xc < outputPoints.x, outputPoints.y> 
+	+operator()
+	+checkArguments()
+}
+
+class cyHeap_h {
+	+Build()
+	+get()
+	+set()
+	+move()
+	+clear()
+	+pop()
+	+copy()
+} 
+
+class cyPointCloud_h {
+	PointData points
+	pointCount
+	PointType
+	numInternal
+	DIMENSIONS
+	+PointCloud() constructor
+	+Build()
+	+BuildKDTree()
+	+getPoints()
+	+getClosest()
+	
+
+}
+
+class buildInterpOp_m {
+	row
+	col
+	interp_wghts
+	Nf
+	Nc
+}
+
+class cyVector_h{
+	+operators()
+	+math functions()
+}
+
+class cySampleElim_h {
+	bounds
+	weightLimiting
+	TilePoint
+	+WeightedSampleElimination()
+	+Eliminate()
+	+SetTiling()
+	+SetWeightLimiting()
+	+GetParameters()
+	+GetMaxPoissonDiskRadius()
+
+}
+
+class cyCore_h {
+	+core functions()
+	+vector functions()
+	+math functions()
+	+memory operators()
+}
+
+class polynomialBasis2D_m {
+	
+}
+
+class mgm_afun_m {
+	+matrix vector multiply function()
+}
+
+class mgm_multilevel_m {
+	// V-cycle solver
+	num_vcycles
+	num_levels
+	smooths
+	defect
+	deltaH <>
+	rh <>
+	fh
+	uh
+	
+}
+
+class mgm_standalone_m {
+	// standalone solver
+	iterations
+	residual
+	tolerance
+	uh
+	fh
+	rh
+	flag
+	
+}
+
+class gmres_m {
+	// gmres solver function for
+	// system of linear equations
+}
+
+class bicg {
+	// BiCGSTAB solver function for
+	// system of linear equations
+}
+
+
+note top of constructor_m
+    Preprocessing Phase:
+	Compute number of levels
+	Poisson disc algorithm coarsens levels
+	Each level stored as point cloud
+	Compute interpolator/restriction operators
+end note
+
+DriverScript_m -u-> gallery_m : 1. call switch case
+gallery_m -d-> DriverScript_m : 2. return sanitized data
+DriverScript_m -r-> mgm2D_m : 3. Build mgm2D object\n with gallery data
+mgm2D_m -u-|> mgm_m : implements
+mgm2D_m -r-> constructor_m :  4. call constructor
+constructor_m -r-> PcCoarsen2D_cpp : 5. calls PcCoarsen2D
+PcCoarsen2D_cpp -r-> cySampleElim_h : 6. call wse constructor(), Eliminate()
+cySampleElim_h -r-> cyCore_h
+cySampleElim_h -d-> cyHeap_h : 7. Coarsening algorithm \n uses priority queue \n of nearest neighbors
+cySampleElim_h --> cyPointCloud_h : 8. construct a point cloud \n as a KD-tree \n after each coarsen \n step (n levels)
+cyPointCloud_h --> cyVector_h 
+constructor_m --> buildInterpOp_m : 9. Build operators at each level
+buildInterpOp_m --> polynomialBasis2D_m 
+constructor_m --> mgm2D_m :  10. return multilevel data \n (struct of operators \n and point clouds)
+mgm2D_m -d-> solve_m : 11. LevelsData mgm2D object\n pass to Solver
+solve_m --> solve_m : 12. Iterate up to n levels \n and solve using \n helper classes
+solve_m -l-> mgm_afun_m
+solve_m --> mgm_multilevel_m
+solve_m --> mgm_standalone_m
+solve_m --> gmres_m
+solve_m --> bicg
+mgm_standalone_m --> mgm_multilevel_m
+solve_m -u-> DriverScript_m : 13. Return final solution \n to driver script\n (u^h, residual, iterations)
+
+@enduml
