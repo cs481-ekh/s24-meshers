@@ -2,7 +2,7 @@ name: Build and Publish
 
 on:
   push:
-    branches: [ "task_47" ] 
+    branches: [ "main" ] 
     
 jobs:
   build-and-publish:
