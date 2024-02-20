@@ -32,6 +32,10 @@ jobs:
     - name: Extract Version and Update .toml
       run: |
         VERSION=${GITHUB_REF#refs/tags/}
+        # Check for 'v.' prefix and remove it if present
+        if [[ $VERSION == v.* ]]; then
+          VERSION=${VERSION:2}
+        fi
         sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml  
     - name: Build Package
       run: |
