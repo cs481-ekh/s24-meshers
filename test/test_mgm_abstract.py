@@ -125,9 +125,10 @@ def test_multilevel_non_matching_dimensions():
     with pytest.raises(ValueError):
         mgm_obj.multilevel(fh, levelsData, smooths, uh)
 
-#--------------------------------------------------------------------------------
-#                          SOlVE TESTS
-#--------------------------------------------------------------------------------
+# #--------------------------------------------------------------------------------
+# #                          SOlVE TESTS
+# #--------------------------------------------------------------------------------
+@pytest.fixture
 def mgmStruct1():
     nodes = np.array([[0, 0], [1, 0], [0, 1]])  # Example nodes
     levelsData = [{"nodes": nodes}]  # Example levelsData
@@ -136,12 +137,13 @@ def test_solve_no_acceleration_default_parameters(mgmStruct1):
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 1e-8  # Default tolerance
     maxIters = 100  # Default maximum number of iterations
+    accel = 'none'
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call solve method with no acceleration and default parameters
-    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1,fh, tol, accel, maxIters )
 
     # Assert the result dimensions
     assert uh.shape == fh.shape
@@ -152,15 +154,17 @@ def test_solve_no_acceleration_default_parameters(mgmStruct1):
 
 
 def test_solve_no_acceleration_custom_parameters(mgmStruct1):
+    # Define input parameters
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 1e-5  # Custom tolerance
     maxIters = 50  # Custom maximum number of iterations
+    accel = 'none'  # No acceleration
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call solve method with no acceleration and custom parameters
-    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1, fh, tol, accel, maxIters)
 
     # Assert the result dimensions
     assert uh.shape == fh.shape
@@ -168,19 +172,19 @@ def test_solve_no_acceleration_custom_parameters(mgmStruct1):
     assert isinstance(relres, float)
     assert isinstance(iters, int)
     assert isinstance(resvec, np.ndarray)
-
 
 def test_solve_no_acceleration_large_system(mgmStruct1):
     # Test with a larger system
     fh = np.ones(100)  # Example right-hand side for a larger system
     tol = 1e-8  # Default tolerance
     maxIters = 100  # Default maximum number of iterations
+    accel = 'none'  # No acceleration
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call solve method with no acceleration and default parameters for a larger system
-    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1, fh, tol, accel, maxIters)
 
     # Assert the result dimensions
     assert uh.shape == fh.shape
@@ -188,6 +192,7 @@ def test_solve_no_acceleration_large_system(mgmStruct1):
     assert isinstance(relres, float)
     assert isinstance(iters, int)
     assert isinstance(resvec, np.ndarray)
+
 
 
 #--------------------------------------------------------------------------------
@@ -195,51 +200,59 @@ def test_solve_no_acceleration_large_system(mgmStruct1):
 #--------------------------------------------------------------------------------
 def test_standalone_convergence(mgmStruct):
     # Define input parameters
+    levelsData = [{"nodes": np.array([[0, 0], [1, 0], [0, 1]])}]  # Example levelsData
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
+    uh = mgmStruct['uh']  # Input vector
     smooths = [2, 2]  # Example smooths
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call standalone method
-    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
 
     # Assert the result
     assert flag == 0  # Convergence flag
     assert relres <= tol  # Relative residual within tolerance
     assert iters <= max_iters  # Number of iterations within maximum
 
+
 def test_standalone_non_convergence(mgmStruct):
     # Define input parameters
+    levelsData = [{"nodes": np.array([[0, 0], [1, 0], [0, 1]])}]  # Example levelsData
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 10  # Maximum number of iterations (set intentionally low for non-convergence)
+    uh = mgmStruct['uh']  # Input vector
     smooths = [2, 2]  # Example smooths
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call standalone method
-    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
 
     # Assert the result
     assert flag == 1  # Non-convergence flag
     assert relres > tol  # Relative residual exceeds tolerance
     assert iters == max_iters  # Maximum iterations reached
+
 def test_standalone_empty_input(mgmStruct):
     # Define empty input parameters
+    levelsData = [{"nodes": np.array([])}]  # Empty levelsData
     fh = np.array([])  # Empty right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
+    uh = np.array([])  # Empty input vector
     smooths = [2, 2]  # Example smooths
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call standalone method
-    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
 
     # Assert the result
     assert flag == 0  # Empty input should converge immediately
@@ -248,16 +261,18 @@ def test_standalone_empty_input(mgmStruct):
 
 def test_standalone_zero_tolerance(mgmStruct):
     # Define input parameters with zero tolerance
+    levelsData = [{"nodes": np.array([[0, 0], [1, 0], [0, 1]])}]  # Example levelsData
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 0  # Zero tolerance
     max_iters = 100  # Maximum number of iterations
+    uh = mgmStruct['uh']  # Input vector
     smooths = [2, 2]  # Example smooths
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call standalone method
-    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
 
     # Assert the result
     assert flag == 0  # Convergence flag
@@ -266,16 +281,18 @@ def test_standalone_zero_tolerance(mgmStruct):
 
 def test_standalone_small_system(mgmStruct):
     # Define input parameters for a very small system
+    levelsData = [{"nodes": np.array([[0]])}]  # Single-element levelsData
     fh = np.array([1])  # Single-element right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
+    uh = np.array([1])  # Single-element input vector
     smooths = [2, 2]  # Example smooths
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
     # Call standalone method
-    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
 
     # Assert the result
     assert flag == 0  # Convergence flag

@@ -4,7 +4,7 @@ class mgm(ABC):
     def __init__(self):
         pass
 
-    def afun(self, uh,mgmobj,unused):
+    def afun(self, uh,mgmobj):
         raise NotImplementedError("Method not yet implemented")
 
     def solve(self,mgmobj,fh,tol,accel,maxIters):
