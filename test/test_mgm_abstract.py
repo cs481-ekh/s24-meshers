@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from src.pymgm_test.mgm import mgm
+from src.pymgm_test.mgm.mgm import  mgm
 
 class TestMGMImplementation(mgm):
     pass
