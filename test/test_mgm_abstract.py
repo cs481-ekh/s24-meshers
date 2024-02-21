@@ -128,9 +128,156 @@ def test_multilevel_non_matching_dimensions():
 #--------------------------------------------------------------------------------
 #                          SOlVE TESTS
 #--------------------------------------------------------------------------------
+def mgmStruct1():
+    nodes = np.array([[0, 0], [1, 0], [0, 1]])  # Example nodes
+    levelsData = [{"nodes": nodes}]  # Example levelsData
+    return levelsData
+def test_solve_no_acceleration_default_parameters(mgmStruct1):
+    fh = np.array([1, 1, 1])  # Example right-hand side
+    tol = 1e-8  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
 
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and default parameters
+    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+
+    # Assert the result dimensions
+    assert uh.shape == fh.shape
+    assert isinstance(flag, int)
+    assert isinstance(relres, float)
+    assert isinstance(iters, int)
+    assert isinstance(resvec, np.ndarray)
+
+
+def test_solve_no_acceleration_custom_parameters(mgmStruct1):
+    fh = np.array([1, 1, 1])  # Example right-hand side
+    tol = 1e-5  # Custom tolerance
+    maxIters = 50  # Custom maximum number of iterations
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and custom parameters
+    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+
+    # Assert the result dimensions
+    assert uh.shape == fh.shape
+    assert isinstance(flag, int)
+    assert isinstance(relres, float)
+    assert isinstance(iters, int)
+    assert isinstance(resvec, np.ndarray)
+
+
+def test_solve_no_acceleration_large_system(mgmStruct1):
+    # Test with a larger system
+    fh = np.ones(100)  # Example right-hand side for a larger system
+    tol = 1e-8  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and default parameters for a larger system
+    uh, flag, relres, iters, resvec = mgm_obj.solve(fh, tol, maxIters, accel='none')
+
+    # Assert the result dimensions
+    assert uh.shape == fh.shape
+    assert isinstance(flag, int)
+    assert isinstance(relres, float)
+    assert isinstance(iters, int)
+    assert isinstance(resvec, np.ndarray)
 
 
 #--------------------------------------------------------------------------------
 #                          STANDALONE TESTS
 #--------------------------------------------------------------------------------
+def test_standalone_convergence(mgmStruct):
+    # Define input parameters
+    fh = np.array([1, 1, 1])  # Example right-hand side
+    tol = 1e-8  # Tolerance
+    max_iters = 100  # Maximum number of iterations
+    smooths = [2, 2]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+
+    # Assert the result
+    assert flag == 0  # Convergence flag
+    assert relres <= tol  # Relative residual within tolerance
+    assert iters <= max_iters  # Number of iterations within maximum
+
+def test_standalone_non_convergence(mgmStruct):
+    # Define input parameters
+    fh = np.array([1, 1, 1])  # Example right-hand side
+    tol = 1e-8  # Tolerance
+    max_iters = 10  # Maximum number of iterations (set intentionally low for non-convergence)
+    smooths = [2, 2]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+
+    # Assert the result
+    assert flag == 1  # Non-convergence flag
+    assert relres > tol  # Relative residual exceeds tolerance
+    assert iters == max_iters  # Maximum iterations reached
+def test_standalone_empty_input(mgmStruct):
+    # Define empty input parameters
+    fh = np.array([])  # Empty right-hand side
+    tol = 1e-8  # Tolerance
+    max_iters = 100  # Maximum number of iterations
+    smooths = [2, 2]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+
+    # Assert the result
+    assert flag == 0  # Empty input should converge immediately
+    assert relres == 0  # Relative residual should be zero
+    assert iters == 0  # No iterations needed
+
+def test_standalone_zero_tolerance(mgmStruct):
+    # Define input parameters with zero tolerance
+    fh = np.array([1, 1, 1])  # Example right-hand side
+    tol = 0  # Zero tolerance
+    max_iters = 100  # Maximum number of iterations
+    smooths = [2, 2]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+
+    # Assert the result
+    assert flag == 0  # Convergence flag
+    assert relres == 0  # Relative residual should be zero regardless of tolerance
+    assert iters == 0  # No iterations needed with zero tolerance
+
+def test_standalone_small_system(mgmStruct):
+    # Define input parameters for a very small system
+    fh = np.array([1])  # Single-element right-hand side
+    tol = 1e-8  # Tolerance
+    max_iters = 100  # Maximum number of iterations
+    smooths = [2, 2]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(mgmStruct, fh, tol, max_iters, smooths)
+
+    # Assert the result
+    assert flag == 0  # Convergence flag
+    assert relres == 0  # Relative residual should be zero for such a small system
+    assert iters == 0  # No iterations needed for such a small system
