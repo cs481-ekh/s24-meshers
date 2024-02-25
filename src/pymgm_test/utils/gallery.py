@@ -17,8 +17,8 @@ class Gallery_m:
         mat_dict = loadmat(filename)
         self.Lh = mat_dict['Lh']
         self.x = mat_dict['x']
-        self.fh = mat_dict['fh']
-        self.uexact = mat_dict['uexact']
+        self.fh = np.transpose(mat_dict['fh'])
+        self.uexact = np.transpose(mat_dict['uexact'])
 
     def _Lh__str__(self):
         return str(self.Lh)
