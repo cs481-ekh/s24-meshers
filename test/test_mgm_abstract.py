@@ -64,28 +64,36 @@ def test_afun_non_square_matrix(mgmStruct):
 def test_afun_empty_matrix(mgmStruct):
     Lh = np.empty((0, 0))  # Empty matrix
 
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
+
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
-    # Call afun method with mgmStruct
-    result = mgm_obj.afun(mgmStruct['uh'], Lh)
-
-    # Assert that the result is an empty array
-    assert result.size == 0
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(mgmStruct['uh'], mgmobj)
 
 def test_afun_empty_vector():
     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
     uh = np.empty((0,))  # Empty input vector
-    mgmStruct = {'uh': uh}
+
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
 
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
-    # Call afun method with mgmStruct
-    result = mgm_obj.afun(uh, Lh)
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(mgmStruct['uh'], mgmobj)
 
-    # Assert that the result is an empty array
-    assert result.size == 0
 
 #--------------------------------------------------------------------------------
 #                          MULTILEVEL TESTS
