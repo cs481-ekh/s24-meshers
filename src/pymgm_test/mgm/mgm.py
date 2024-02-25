@@ -13,13 +13,6 @@ class mgm(ABC):
         self.has_const_nullspace = False
 
     from ._afun import afun
-    def solve(self, mgmobj, fh, tol, accel, maxIters):
-        pass
-
-
-    def multilevel(self, fh, multilevelStruct, smooths, uh):
-        pass
-
-
-    def standalone(self, levelsData, fh, tol, max_iter, uh, smooths):
-        pass
+    from ._solve import solve
+    from ._multilevel import multilevel
+    from ._standalone import standalone
