@@ -16,3 +16,10 @@ class mgm(ABC):
     from ._solve import solve
     from ._multilevel import multilevel
     from ._standalone import standalone
+
+    def afuncon(self):
+        pass
+    def multilevelcon(self):
+        pass
+    def standalonecon(self):
+        pass
