@@ -33,8 +33,12 @@ def multilevel(self,fh, levelsData, smooths, uh):
                 tmpres = tmpres + fh
                 tmpres = np.linalg.inv(tmpres)
                 uh = np.dot(levelsData[lvl]['Mhf'], tmpres)
-                # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
-                # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
+
+                # tmpres = np.dot(levelsData[lvl]['Nhb'], uh)
+                # tmpres = tmpres + fh
+                # tmpres = np.linalg.inv(tmpres)
+                # uh = np.dot(levelsData[lvl]['Mhb'], tmpres)
+
             deltaH[lvl] = uh
             # Defect
             defect = fh - np.dot(levelsData[lvl]['Lh'], uh)
@@ -53,7 +57,11 @@ def multilevel(self,fh, levelsData, smooths, uh):
             fh = rH[lvl]
             # Smooth
             for k in range(post_smooth):
-                uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
+                tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
+                tmpres = tmpres + fh
+                tmpres = np.linalg.inv(tmpres)
+                uh = np.dot(levelsData[lvl]['Mhf'], tmpres)
+                # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
