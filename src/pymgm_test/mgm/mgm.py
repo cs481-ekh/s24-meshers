@@ -23,4 +23,7 @@ class mgm(ABC):
         pass
     def standalonecon(self):
         pass
+    @abstractmethod
+    def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
+        pass
 
