@@ -5,15 +5,15 @@ from ._multilevel import multilevel
 def standalone(self,mgmStruct, fh, tol, max_iter, uh, smooths):
     iter_count = 0
     residual = np.inf
-    resvec = np.ones(max_iter + 1)
+    resvec = np.ones((max_iter + 1, 1))
     nrmrhs = np.linalg.norm(fh)
     resvec[0] = nrmrhs
     reltol = tol * nrmrhs
-    Lh = mgmStruct[0].Lh
+    Lh = mgmStruct[0]['Lh']
 
     while residual > reltol and iter_count < max_iter:
         uh = multilevel(fh, mgmStruct, smooths, uh)
-        rh = fh - Lh @ uh
+        rh = fh - np.dot(Lh , uh)
         iter_count += 1
         residual = np.linalg.norm(rh)
         resvec[iter_count] = residual
