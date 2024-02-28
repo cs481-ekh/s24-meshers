@@ -328,7 +328,31 @@ def test_standalone_non_convergence(mgmStruct):
 
 def test_standalone_empty_input(mgmStruct):
     # Define empty input parameters
-    levelsData = [{"nodes": np.array([])}]  # Empty levelsData
+    levelsData = [
+        {
+            'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
+            'stencilSize': 4,
+            'rbfOrder': 0,
+            'rbfPolyDeg': 0,
+            'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
+            'idx': [],
+            'Lh': [],
+            'DLh': [],
+            'I': [],
+            'R': [],
+            'Mhf': [],
+            'Nhf': [],
+            'Mhb': [],
+            'Nhb': [],
+            'preSmooth': 2,
+            'postSmooth': 2,
+            'Ihat': 1,
+            'Rhat': 1,
+            'w': [],
+            'Qh': 0
+        },
+        # Add more dictionaries for additional levels if needed
+    ] # Empty levelsData
     fh = np.array([])  # Empty right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
@@ -348,7 +372,31 @@ def test_standalone_empty_input(mgmStruct):
 
 def test_standalone_zero_tolerance(mgmStruct):
     # Define input parameters with zero tolerance
-    levelsData = [{"nodes": np.array([[0, 0], [1, 0], [0, 1]])}]  # Example levelsData
+    levelsData = [
+        {
+            'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
+            'stencilSize': 4,
+            'rbfOrder': 0,
+            'rbfPolyDeg': 0,
+            'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
+            'idx': [],
+            'Lh': [],
+            'DLh': [],
+            'I': [],
+            'R': [],
+            'Mhf': [],
+            'Nhf': [],
+            'Mhb': [],
+            'Nhb': [],
+            'preSmooth': 2,
+            'postSmooth': 2,
+            'Ihat': 1,
+            'Rhat': 1,
+            'w': [],
+            'Qh': 0
+        },
+        # Add more dictionaries for additional levels if needed
+    ]  # Example levelsData
     fh = np.array([1, 1, 1])  # Example right-hand side
     tol = 0  # Zero tolerance
     max_iters = 100  # Maximum number of iterations
@@ -368,7 +416,31 @@ def test_standalone_zero_tolerance(mgmStruct):
 
 def test_standalone_small_system(mgmStruct):
     # Define input parameters for a very small system
-    levelsData = [{"nodes": np.array([[0]])}]  # Single-element levelsData
+    levelsData = [
+        {
+            'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
+            'stencilSize': 4,
+            'rbfOrder': 0,
+            'rbfPolyDeg': 0,
+            'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
+            'idx': [],
+            'Lh': [],
+            'DLh': [],
+            'I': [],
+            'R': [],
+            'Mhf': [],
+            'Nhf': [],
+            'Mhb': [],
+            'Nhb': [],
+            'preSmooth': 2,
+            'postSmooth': 2,
+            'Ihat': 1,
+            'Rhat': 1,
+            'w': [],
+            'Qh': 0
+        },
+        # Add more dictionaries for additional levels if needed
+    ]  # Single-element levelsData
     fh = np.array([1])  # Single-element right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
