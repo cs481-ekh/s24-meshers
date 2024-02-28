@@ -15,21 +15,24 @@ def multilevel(self,fh, levelsData, smooths, uh):
 
     num_levels = len(levelsData) - 2
 
-    rH = [None] * (num_levels + 1)
-    deltaH = [None] * (num_levels + 1)
+    rH = [None] * (num_levels + 2)
+    deltaH = [None] * (num_levels + 2)
 
     rH[0] = fh
     deltaH[0] = uh
 
     for j in range(num_vcycles):
-        lvl_counter = -1
+
         for lvl in range(num_levels):
             uh = deltaH[lvl]
             fh = rH[lvl]
-
             # Smooth
+
             for k in range(pre_smooth):
-                uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
+                tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
+                tmpres = tmpres + fh
+                tmpres = np.linalg.inv(tmpres)
+                uh = np.dot(levelsData[lvl]['Mhf'], tmpres)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
             deltaH[lvl] = uh
@@ -38,9 +41,12 @@ def multilevel(self,fh, levelsData, smooths, uh):
             # Restrict
             rH[lvl + 1] = np.dot(levelsData[lvl + 1]['R'], defect)
             deltaH[lvl + 1] = np.zeros_like(rH[lvl + 1])
-        lvl_counter += 1
+
+
+
         # Coarse solve
-        deltaH[lvl_counter  ] = np.linalg.solve(levelsData[lvl_counter ]['DLh'], rH[lvl_counter ])
+        deltaH[-1] = np.dot(levelsData[num_levels + 1]['DLh'], np.linalg.inv(rH[num_levels + 1]))
+        #deltaH[lvl_counter ] = np.linalg.solve(levelsData[lvl_counter ]['DLh'], rH[lvl_counter ])
 
         for lvl in range(num_levels, 0, -1):
             uh = deltaH[lvl] + np.dot(levelsData[lvl]['I'], deltaH[lvl + 1])
