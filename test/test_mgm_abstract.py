@@ -263,7 +263,8 @@ def test_standalone_convergence(mgmStruct):
         },
         # Add more dictionaries for additional levels if needed
     ] # Example levelsData
-    fh = np.array([1, 1, 1])  # Example right-hand side
+    fh = np.array([[1, 2], [3,4]])  # Example right-hand side
+  # Example right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
     uh = mgmStruct['uh']  # Input vector
@@ -309,7 +310,8 @@ def test_standalone_non_convergence(mgmStruct):
         # Add more dictionaries for additional levels if needed
     ]
     # Example levelsData
-    fh = np.array([1, 1, 1])  # Example right-hand side
+    fh = np.array([[1, 2], [3,4]])  # Example right-hand side
+  # Example right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 10  # Maximum number of iterations (set intentionally low for non-convergence)
     uh = mgmStruct['uh']  # Input vector
