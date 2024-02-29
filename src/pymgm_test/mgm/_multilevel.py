@@ -31,13 +31,8 @@ def multilevel(self,fh, levelsData, smooths, uh):
             for k in range(pre_smooth):
                 tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
                 tmpres = tmpres + fh
-                tmpres = np.linalg.inv(tmpres)
-                uh = np.dot(levelsData[lvl]['Mhf'], tmpres)
-
-                # tmpres = np.dot(levelsData[lvl]['Nhb'], uh)
-                # tmpres = tmpres + fh
-                # tmpres = np.linalg.inv(tmpres)
-                # uh = np.dot(levelsData[lvl]['Mhb'], tmpres)
+                solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
+                uh = solution
 
             deltaH[lvl] = uh
             # Defect
@@ -49,7 +44,13 @@ def multilevel(self,fh, levelsData, smooths, uh):
 
 
         # Coarse solve
-        deltaH[-1] = np.dot(levelsData[num_levels + 1]['DLh'], np.linalg.inv(rH[num_levels + 1]))
+        # rhs = np.dot(levelsData[lvl].Nhf, uh) + fh
+        #
+        # # Use numpy.linalg.lstsq to solve the least squares problem
+        solution, residuals, rank, s = np.linalg.lstsq(levelsData[num_levels+1]['DLh'], rH[num_levels+1], rcond=None)
+        deltaH[-1] = solution
+         # deltaH[-1] = np.dot(levelsData[num_levels + 1]['DLh'], np.linalg.inv(rH[num_levels + 1]))
+
         #deltaH[lvl_counter ] = np.linalg.solve(levelsData[lvl_counter ]['DLh'], rH[lvl_counter ])
 
         for lvl in range(num_levels, 0, -1):
@@ -59,8 +60,8 @@ def multilevel(self,fh, levelsData, smooths, uh):
             for k in range(post_smooth):
                 tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
                 tmpres = tmpres + fh
-                tmpres = np.linalg.inv(tmpres)
-                uh = np.dot(levelsData[lvl]['Mhf'], tmpres)
+                solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
+                uh = solution
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
