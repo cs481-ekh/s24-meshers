@@ -12,7 +12,7 @@ def standalone(self,mgmStruct, fh, tol, max_iter, uh, smooths):
     Lh = mgmStruct[0]['Lh']
 
     while residual > reltol and iter_count < max_iter:
-        uh = multilevel(fh, mgmStruct, smooths, uh)
+        uh = multilevel(self,fh, mgmStruct, smooths, uh)
         rh = fh - np.dot(Lh , uh)
         iter_count += 1
         residual = np.linalg.norm(rh)
