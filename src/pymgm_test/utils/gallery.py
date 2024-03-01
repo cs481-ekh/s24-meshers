@@ -38,3 +38,5 @@ class Gallery_m:
     def _uexact__str__(self):
         return str(self.uexact)
 
+    def _det__str__(self):
+        return str(self.det)
