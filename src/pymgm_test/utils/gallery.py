@@ -23,8 +23,8 @@ class Gallery_m:
 
     def load_mat_test(self, filename):
         mat_dict = loadmat(filename)
-        self.Lh = mat_dict['Lh']
-        self.det = mat_dict['det_Lh'][0][0]
+        self.det = mat_dict['matr'][0][0]
+        self.det = mat_dict['determinant'][0][0]
 
     def _Lh__str__(self):
         return str(self.Lh)
