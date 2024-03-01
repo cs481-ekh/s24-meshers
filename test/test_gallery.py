@@ -1,5 +1,3 @@
-import pytest
-
 from src.pymgm_test.utils.gallery import Gallery_m
 
 # The test cases below ensure that the matlab files arei beng loaded in properly 
