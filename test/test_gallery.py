@@ -4,10 +4,9 @@ from src.pymgm_test.utils.gallery import Gallery_m
 
 # The test cases below ensure that the matlab files arei beng loaded in properly 
 # (containing specific data about the matrix and its determinant) 
-
-def test_load_matrix(filename, det):
+def test_load_matrix(filenm, det):
     g = Gallery_m()
-    g.load_mat_test(filename)
+    g.load_mat_test(filenm)
     print(g._det__str__())
     assert g._det__str__() == str(det) # The determinant
 
