@@ -1,0 +1,77 @@
+@startuml
+
+
+
+class PcCoarsen2D_cpp {
+	vector < Point2d > inputPoints
+	WeightedSampleElimination object
+	outputpoints = wse.Eliminate
+	Nc = outputPoints.size
+	xc < outputPoints.x, outputPoints.y> 
+	+operator()
+	+checkArguments()
+}
+
+class cyHeap_h {
+	+Build()
+	+get()
+	+set()
+	+move()
+	+clear()
+	+pop()
+	+copy()
+} 
+
+class cyPointCloud_h {
+	PointData points
+	pointCount
+	PointType
+	numInternal
+	DIMENSIONS
+	+PointCloud() constructor
+	+Build()
+	+BuildKDTree()
+	+getPoints()
+	+getClosest()
+	
+
+}
+
+
+
+class cyVector_h{
+	+operators()
+	+math functions()
+}
+
+class cySampleElim_h {
+	bounds
+	weightLimiting
+	TilePoint
+	+WeightedSampleElimination()
+	+Eliminate()
+	+SetTiling()
+	+SetWeightLimiting()
+	+GetParameters()
+	+GetMaxPoissonDiskRadius()
+
+}
+
+class cyCore_h {
+	+core functions()
+	+vector functions()
+	+math functions()
+	+memory operators()
+}
+
+
+
+
+PcCoarsen2D_cpp -r-> cySampleElim_h : 6. call wse constructor(), Eliminate()
+cySampleElim_h -r-> cyCore_h
+cySampleElim_h -d-> cyHeap_h : 7. Coarsening algorithm \n uses priority queue \n of nearest neighbors
+cySampleElim_h --> cyPointCloud_h : 8. construct a point cloud \n as a KD-tree \n after each coarsen \n step (n levels)
+cyPointCloud_h --> cyVector_h 
+
+
+@enduml
