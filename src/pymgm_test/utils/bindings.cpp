@@ -1,11 +1,13 @@
 #include <pybind11/pybind11.h>
-#include "cyPointCloud.h"
+#include "PcCoarsen2D.cpp"
 
 namespace py = pybind11;
 using namespace cy;
 
-PYBIND11_MODULE(cyPCModule, m) {
-    py::class_<PointCloud>(m, "PointCloud")
+PYBIND11_MODULE(PcCoarsen, m) {
+    py::class_<PcCoarsen2D>(m, "PcCoarsen2D")
         .def(py::init<>())
-        .def("getPointCount", &PointCloud::GetPointCount);
+        .def("__call__", &PcCoarsen2D::operator());
 }
+
+
