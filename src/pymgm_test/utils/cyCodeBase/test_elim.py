@@ -1,6 +1,5 @@
-#import pytest
+import pytest
 import numpy as np
-# from ..src.pymgm_test.utils.cyCodeBase  import elim
 import elim # library for testing which links directly to wse class. 
 
 def poisson_gen_base(n):
@@ -12,8 +11,8 @@ def poisson_gen_base(n):
     x = np.column_stack([xx.flatten(), yy.flatten()])
     return x
 
-n=8
-x = poisson_gen_base(8) #  generate 64 points
+N=8
+x = poisson_gen_base(N) #  generate 64 points
 base_case_lvl_1 = x
 
 x1 = np.array([-0.77777778, -0.33333333, -0.77777778, -0.77777778, -0.11111111, -0.77777778, 0.11111111, 0.77777778, 0.77777778, -0.33333333, 0.33333333, -0.33333333, 0.11111111, 0.77777778, 0.33333333, 0.77777778])
