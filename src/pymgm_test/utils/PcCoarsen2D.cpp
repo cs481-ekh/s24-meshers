@@ -40,11 +40,11 @@ public:
 		int N = points.size();
         std::vector< cy::Point2d > inputPoints(N);
 		// int count = 0;
-/* 		int idx = 0; 
+ 		int idx = 0; 
 		for ( idx = 0; idx < N; idx++ ) {
-		    inputPoints[idx].x = doubleArray[idx][0];
-		    inputPoints[idx].y = doubleArray[idx][1];
-		}  */       
+		    inputPoints[idx].x = points[idx][0];
+		    inputPoints[idx].y = points[idx][1];
+		}         
 
 		// create weighted elimination object
 		cy::WeightedSampleElimination< Point2d, double, 2, int > wse;
