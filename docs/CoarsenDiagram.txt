@@ -1,10 +1,15 @@
 @startuml
 
-
+class constructor_m {
+	
+}
 
 class PcCoarsen2D_cpp {
 	vector < Point2d > inputPoints
-	WeightedSampleElimination object
+	vector < Point2d > outputPoints
+	WeightedSampleElimination< Point2d, double, 2, int > wse
+	float area
+	float d_max
 	outputpoints = wse.Eliminate
 	Nc = outputPoints.size
 	xc < outputPoints.x, outputPoints.y> 
@@ -45,6 +50,10 @@ class cyVector_h{
 }
 
 class cySampleElim_h {
+	alpha
+	beta
+	gamma
+	tiling
 	bounds
 	weightLimiting
 	TilePoint
@@ -54,6 +63,7 @@ class cySampleElim_h {
 	+SetWeightLimiting()
 	+GetParameters()
 	+GetMaxPoissonDiskRadius()
+	+DoEliminate()
 
 }
 
@@ -66,11 +76,12 @@ class cyCore_h {
 
 
 
-
-PcCoarsen2D_cpp -r-> cySampleElim_h : 6. call wse constructor(), Eliminate()
+constructor_m -r-> PcCoarsen2D_cpp : Matlab Mex function \n input/output
+PcCoarsen2D_cpp -d-> constructor_m 
+PcCoarsen2D_cpp -r-> cySampleElim_h
 cySampleElim_h -r-> cyCore_h
-cySampleElim_h -d-> cyHeap_h : 7. Coarsening algorithm \n uses priority queue \n of nearest neighbors
-cySampleElim_h --> cyPointCloud_h : 8. construct a point cloud \n as a KD-tree \n after each coarsen \n step (n levels)
+cySampleElim_h -d-> cyHeap_h
+cySampleElim_h -d-> cyPointCloud_h 
 cyPointCloud_h --> cyVector_h 
 
 
