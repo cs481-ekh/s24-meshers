@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import h5py
 import scipy as sp
 from src.pymgm_test.mgm.mgm import  mgm
 from sqrpoisson import squarepoissond
@@ -107,8 +106,7 @@ def mgmStruct():
 @pytest.fixture
 def example_input():
     # Load the .mat file
-    with h5py.File('mgmStruct_before.mat', 'r') as file:
-        mgm_struct_before = file['mgmStruct_before']
+
     mat_contents = sp.io.loadmat('mgmStruct_before.mat')
     keys = list(mat_contents.keys())
     print( mat_contents['mgmStruct_before'].shape)
@@ -116,29 +114,29 @@ def example_input():
     levelsData = []
 
     # Iterate over the data from the .mat file
-    for i in range(len(mat_contents['mgmStruct_before'][0])):
+    for i in range(len(mat_contents['mgmStruct_before'])):
         level_data = {
-            'nodes': mat_contents['mgmStruct_before'][0][i]['nodes'][0],
-            'stencilSize': mat_contents['mgmStruct_before'][0][i]['stencilSize'][0][0],
-            'rbfOrder': mat_contents['mgmStruct_before'][0][i]['rbfOrder'][0][0],
-            'rbfPolyDeg': mat_contents['mgmStruct_before'][0][i]['rbfPolyDeg'][0][0],
-            'rbf': mat_contents['mgmStruct_before'][0][i]['rbf'][0][0],
+            'nodes': mat_contents['mgmStruct_before'][i][0]['nodes'],
+            'stencilSize': mat_contents['mgmStruct_before'][i][0]['stencilSize'],
+            'rbfOrder': mat_contents['mgmStruct_before'][i][0]['rbfOrder'],
+            'rbfPolyDeg': mat_contents['mgmStruct_before'][i][0]['rbfPolyDeg'],
+            'rbf': mat_contents['mgmStruct_before'][i][0]['rbf'],
             # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-            'idx': mat_contents['mgmStruct_before'][0][i]['idx'][0],
-            'Lh': mat_contents['mgmStruct_before'][0][i]['Lh'],
-            'DLh': mat_contents['mgmStruct_before'][0][i]['DLh'][0],
-            'I': mat_contents['mgmStruct_before'][0][i]['I'][0],
-            'R': mat_contents['mgmStruct_before'][0][i]['R'][0],
-            'Mhf': mat_contents['mgmStruct_before'][0][i]['Mhf'][0],
-            'Nhf': mat_contents['mgmStruct_before'][0][i]['Nhf'][0],
-            'Mhb': mat_contents['mgmStruct_before'][0][i]['Mhb'][0],
-            'Nhb': mat_contents['mgmStruct_before'][0][i]['Nhb'][0],
-            'preSmooth': mat_contents['mgmStruct_before'][0][i]['preSmooth'][0][0],
-            'postSmooth': mat_contents['mgmStruct_before'][0][i]['postSmooth'][0][0],
-            'Ihat': mat_contents['mgmStruct_before'][0][i]['Ihat'][0][0],
-            'Rhat': mat_contents['mgmStruct_before'][0][i]['Rhat'][0][0],
-            'w': mat_contents['mgmStruct_before'][0][i]['w'][0],
-            'Qh': mat_contents['mgmStruct_before'][0][i]['Qh'][0][0]
+            'idx': mat_contents['mgmStruct_before'][i][0]['idx'],
+            'Lh': mat_contents['mgmStruct_before'][i][0]['Lh'],
+            'DLh': mat_contents['mgmStruct_before'][i][0]['DLh'],
+            'I': mat_contents['mgmStruct_before'][i][0]['I'],
+            'R': mat_contents['mgmStruct_before'][i][0]['R'],
+            'Mhf': mat_contents['mgmStruct_before'][i][0]['Mhf'],
+            'Nhf': mat_contents['mgmStruct_before'][i][0]['Nhf'],
+            'Mhb': mat_contents['mgmStruct_before'][i][0]['Mhb'],
+            'Nhb': mat_contents['mgmStruct_before'][i][0]['Nhb'],
+            'preSmooth': mat_contents['mgmStruct_before'][i][0]['preSmooth'],
+            'postSmooth': mat_contents['mgmStruct_before'][i][0]['postSmooth'],
+            'Ihat': mat_contents['mgmStruct_before'][i][0]['Ihat'],
+            'Rhat': mat_contents['mgmStruct_before'][i][0]['Rhat'],
+            'w': mat_contents['mgmStruct_before'][i][0]['w'],
+            'Qh': mat_contents['mgmStruct_before'][i][0]['Qh']
         }
         levelsData.append(level_data)
     return levelsData
@@ -146,15 +144,17 @@ def example_input():
 
 def test_multilevel_solution_accuracy(example_input):
 
-    smooths = [2, 2]
-    fh = np.array([1, 1])
-
+    smooths = [example_input[0]['preSmooth'][0][0], example_input[0]['postSmooth'][0][0]]
+    fh = sp.io.loadmat('fh_before_multi.mat')
+    fh = fh['fh']
     expected_result = sp.io.loadmat('uh_after_multi.mat')
-    uh = np.zeros(2)
+    expected_result = expected_result['uh'].reshape(-1,1)
+    uh = sp.io.loadmat('uh_before_multi.mat')
+    uh = uh['uh']
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
-    result = mgm_obj.multilevel(fh, example_input, smooths, uh)
+    result = mgm_obj.multilevel(fh, example_input, smooths, uh).reshape(-1,1)
 
 
     assert np.allclose(expected_result, result)

@@ -41,6 +41,6 @@ RUN pyenv install 3.10.2
 WORKDIR /app
 
 # Install Python dependencies for each version and upgrade pip
-RUN pyenv global 3.8.12 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy h5py
-RUN pyenv global 3.9.7 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy h5py
-RUN pyenv global 3.10.2 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy h5py
+RUN pyenv global 3.8.12 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy
+RUN pyenv global 3.9.7 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy
+RUN pyenv global 3.10.2 && /root/.pyenv/shims/python -m pip install --upgrade pip numpy flake8 pytest scipy

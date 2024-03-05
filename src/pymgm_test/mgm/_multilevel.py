@@ -1,5 +1,6 @@
 import numpy as np
-
+from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import spsolve
 
 def multilevel(self,fh, levelsData, smooths, uh):
     num_vcycles = 1
@@ -13,10 +14,10 @@ def multilevel(self,fh, levelsData, smooths, uh):
         uh = np.zeros_like(fh)  # Use zero initial guess
 
 
-    num_levels = len(levelsData) - 2
+    num_levels = len(levelsData) - 1
 
-    rH = [None] * (num_levels + 2)
-    deltaH = [None] * (num_levels + 2)
+    rH = [None] * (num_levels + 1)
+    deltaH = [None] * (num_levels + 1)
 
     rH[0] = fh
     deltaH[0] = uh
@@ -29,49 +30,58 @@ def multilevel(self,fh, levelsData, smooths, uh):
             # Smooth
 
             for k in range(pre_smooth):
-                tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
-                tmpres = tmpres + fh
-                solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
+                tmpres = levelsData[lvl]['Nhf'].dot(uh) + fh
+                solution = spsolve(levelsData[lvl]['Mhf'], tmpres).reshape(-1, 1)
+                # solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
                 uh = solution
 
             deltaH[lvl] = uh
             # Defect
-            defect = fh - np.dot(levelsData[lvl]['Lh'], uh)
+            # defect = fh - np.dot(levelsData[lvl]['Lh'], uh)
+
+            defect = fh - levelsData[lvl]['Lh'].dot(uh)
             # Restrict
-            rH[lvl + 1] = np.dot(levelsData[lvl + 1]['R'], defect)
+            # rH[lvl + 1] = np.dot(levelsData[lvl + 1]['R'], defect)
+            rH[lvl + 1] = levelsData[lvl + 1]['R'].dot(defect)
             deltaH[lvl + 1] = np.zeros_like(rH[lvl + 1])
 
 
 
         # Coarse solve
         # rhs = np.dot(levelsData[lvl].Nhf, uh) + fh
-        #
-        # # Use numpy.linalg.lstsq to solve the least squares problem
-        solution, residuals, rank, s = np.linalg.lstsq(levelsData[num_levels+1]['DLh'], rH[num_levels+1], rcond=None)
+        solution = spsolve(levelsData[num_levels]['DLh'], rH[num_levels])
+
         deltaH[-1] = solution
-         # deltaH[-1] = np.dot(levelsData[num_levels + 1]['DLh'], np.linalg.inv(rH[num_levels + 1]))
 
-        #deltaH[lvl_counter ] = np.linalg.solve(levelsData[lvl_counter ]['DLh'], rH[lvl_counter ])
+        for lvl in range(num_levels , 0, -1):
+            # uh = deltaH[lvl] + np.dot(levelsData[lvl]['I'], deltaH[lvl + 1])
+            # deltah1 =deltaH[lvl].reshape(-1,1)
+            # lvlsdatlvl = levelsData[lvl-1];
+            # tmp = levelsData[lvl-1]['I'].dot( deltaH[lvl].reshape(-1,1))
 
-        for lvl in range(num_levels, 0, -1):
-            uh = deltaH[lvl] + np.dot(levelsData[lvl]['I'], deltaH[lvl + 1])
-            fh = rH[lvl]
+            uh = deltaH[lvl-1].reshape(-1,1) + levelsData[lvl-1]['I'].dot( deltaH[lvl].reshape(-1,1))
+            fh = rH[lvl-1]
             # Smooth
             for k in range(post_smooth):
-                tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
-                tmpres = tmpres + fh
-                solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
+                # tmpres = np.dot(levelsData[lvl]['Nhf'], uh)
+                # tmpres = tmpres + fh
+                # solution, residuals, rank, s = np.linalg.lstsq(levelsData[lvl]['Mhf'], tmpres, rcond=None)
+                nhf = levelsData[lvl-1]['Nhf'];
+                nuh = nhf.dot(uh);
+                nuhf = nuh + fh;
+                tmpres = levelsData[lvl-1]['Nhf'].dot(uh) + fh
+                solution = spsolve(levelsData[lvl-1]['Mhf'], tmpres)
                 uh = solution
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
-            deltaH[lvl] = uh
+            deltaH[lvl-1] = uh
 
         # Check residual
         # rh = fh - np.dot(levelsData[lvl]['Lh'], uh)
         # residual[j] = np.linalg.norm(rh) / np.linalg.norm(fh)
         # print(f'iter={j}, ||r||={residual[j]:.4e}')
-    return deltaH[0]
+    return uh
 
 
