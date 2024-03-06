@@ -2,9 +2,9 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import spsolve
 
-def multilevel(self,fh, levelsData, smooths, uh):
+def multilevel(self,fh, levelsData, smooths=None, uh=None):
     num_vcycles = 1
-    if smooths is None:
+    if smooths is None or len(smooths) != 2:
         pre_smooth = 1
         post_smooth = 1
     else:

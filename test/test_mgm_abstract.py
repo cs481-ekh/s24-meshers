@@ -107,7 +107,7 @@ def mgmStruct():
 def example_input():
     # Load the .mat file
 
-    mat_contents = sp.io.loadmat('mgmStruct_before.mat')
+    mat_contents = sp.io.loadmat('multievel_data/mgmStruct_before.mat')
     keys = list(mat_contents.keys())
     print( mat_contents['mgmStruct_before'].shape)
     # Initialize an empty list to store the levelsData
@@ -145,11 +145,11 @@ def example_input():
 def test_multilevel_solution_accuracy(example_input):
 
     smooths = [example_input[0]['preSmooth'][0][0], example_input[0]['postSmooth'][0][0]]
-    fh = sp.io.loadmat('fh_before_multi.mat')
+    fh = sp.io.loadmat('multievel_data/fh_before_multi.mat')
     fh = fh['fh']
-    expected_result = sp.io.loadmat('uh_after_multi.mat')
+    expected_result = sp.io.loadmat('multievel_data/uh_after_multi.mat')
     expected_result = expected_result['uh'].reshape(-1,1)
-    uh = sp.io.loadmat('uh_before_multi.mat')
+    uh = sp.io.loadmat('multievel_data/uh_before_multi.mat')
     uh = uh['uh']
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
@@ -159,33 +159,33 @@ def test_multilevel_solution_accuracy(example_input):
 
     assert np.allclose(expected_result, result)
 
-#
-# def test_multilevel_empty_input():
-#     # Test when the input arrays are empty
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     with pytest.raises(ValueError):
-#         mgm_obj.multilevel(np.array([]), [], [], np.array([]))
-#
-#
-# def test_multilevel_non_matching_dimensions():
-#     # Test when input arrays have non-matching dimensions
-#     levelsData = [
-#         {"Mhf": np.array([[2, -1], [-1, 2]]), "Nhf": np.eye(2), "Lh": np.eye(2), "R": np.eye(2), "DLh": np.eye(2),
-#          "I": np.eye(2)},
-#         {"Mhf": np.array([[2, -1], [-1, 2]]), "Nhf": np.eye(2), "Lh": np.eye(2), "R": np.eye(2), "DLh": np.eye(2),
-#          "I": np.eye(2)}
-#     ]
-#     smooths = [2, 2]
-#     fh = np.array([1, 1, 1])  # Incorrect size
-#     uh = np.zeros(3)  # Incorrect size
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     with pytest.raises(ValueError):
-#         mgm_obj.multilevel(fh, levelsData, smooths, uh)
+
+def test_multilevel_empty_input():
+    # Test when the input arrays are empty
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    with pytest.raises(IndexError):
+        mgm_obj.multilevel(np.array([]), [], [], np.array([]))
+
+
+def test_multilevel_non_matching_dimensions():
+    # Test when input arrays have non-matching dimensions
+    levelsData = [
+        {"Mhf": np.array([[2, -1], [-1, 2]]), "Nhf": np.eye(2), "Lh": np.eye(2), "R": np.eye(2), "DLh": np.eye(2),
+         "I": np.eye(2)},
+        {"Mhf": np.array([[2, -1], [-1, 2]]), "Nhf": np.eye(2), "Lh": np.eye(2), "R": np.eye(2), "DLh": np.eye(2),
+         "I": np.eye(2)}
+    ]
+    smooths = [2, 2]
+    fh = np.array([1, 1, 1])  # Incorrect size
+    uh = np.zeros(3)  # Incorrect size
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    with pytest.raises(ValueError):
+        mgm_obj.multilevel(fh, levelsData, smooths, uh)
 
 # # #--------------------------------------------------------------------------------
 # # #                          SOlVE TESTS
