@@ -103,7 +103,7 @@ def test_afun_empty_vector():
 # #--------------------------------------------------------------------------------
 # #                          MULTILEVEL TESTS
 # #--------------------------------------------------------------------------------
-# @pytest.fixture
+@pytest.fixture
 def example_input():
     # Load the .mat file
 
