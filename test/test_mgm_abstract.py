@@ -22,88 +22,88 @@ def mgmStruct():
 #--------------------------------------------------------------------------------
 #                          AFUN TESTS
 #--------------------------------------------------------------------------------
-# def test_afun_square_matrix(mgmStruct):
-#     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-#
-#     # Create instances of the Struct class with different Lh arrays
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call afun method with mgmStruct
-#     result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#     # Perform manual matrix-vector multiplication for validation
-#     expected_result = np.array([5, 11])
-#
-#     # Assert that the result matches the expected result
-#     assert np.array_equal(result, expected_result)
-#
-# def test_afun_non_square_matrix(mgmStruct):
-#     Lh = np.array([[1, 2], [3, 4], [5, 6]])  # Adjusted Lh to 3x2 matrix
-#
-#     # Create instances of the Struct class with different Lh arrays
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call afun method with mgmStruct
-#     result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#     # Perform manual matrix-vector multiplication for validation
-#     expected_result = np.array([5, 11, 17])  # Adjusted expected result for the 3x2 matrix
-#
-#     # Assert that the result matches the expected result
-#     assert np.array_equal(result, expected_result)
-#
-# def test_afun_empty_matrix(mgmStruct):
-#     Lh = np.empty((0, 0))  # Empty matrix
-#
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Assert that calling afun with an empty matrix raises an exception
-#     with pytest.raises(Exception):
-#         mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-# def test_afun_empty_vector():
-#     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-#     uh = np.empty((0,))  # Empty input vector
-#
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Assert that calling afun with an empty matrix raises an exception
-#     with pytest.raises(Exception):
-#         mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#
+def test_afun_square_matrix(mgmStruct):
+    Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
+
+    # Create instances of the Struct class with different Lh arrays
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Call afun method with mgmStruct
+    result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
+
+    # Perform manual matrix-vector multiplication for validation
+    expected_result = np.array([5, 11])
+
+    # Assert that the result matches the expected result
+    assert np.array_equal(result, expected_result)
+
+def test_afun_non_square_matrix(mgmStruct):
+    Lh = np.array([[1, 2], [3, 4], [5, 6]])  # Adjusted Lh to 3x2 matrix
+
+    # Create instances of the Struct class with different Lh arrays
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Call afun method with mgmStruct
+    result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
+
+    # Perform manual matrix-vector multiplication for validation
+    expected_result = np.array([5, 11, 17])  # Adjusted expected result for the 3x2 matrix
+
+    # Assert that the result matches the expected result
+    assert np.array_equal(result, expected_result)
+
+def test_afun_empty_matrix(mgmStruct):
+    Lh = np.empty((0, 0))  # Empty matrix
+
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(mgmStruct['uh'], mgmobj)
+
+def test_afun_empty_vector():
+    Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
+    uh = np.empty((0,))  # Empty input vector
+
+    struct1 = Struct(Lh)
+    struct2 = Struct(Lh)
+
+    # Create a list of the struct instances
+    mgmobj = [struct1, struct2]
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(mgmStruct['uh'], mgmobj)
+
+
 # #--------------------------------------------------------------------------------
 # #                          MULTILEVEL TESTS
 # #--------------------------------------------------------------------------------
-@pytest.fixture
+# @pytest.fixture
 def example_input():
     # Load the .mat file
 
@@ -260,53 +260,31 @@ def test_multilevel_non_matching_dimensions():
 # #--------------------------------------------------------------------------------
 # #                          STANDALONE TESTS
 # #--------------------------------------------------------------------------------
-# def test_standalone_convergence(mgmStruct):
+# def test_standalone_convergence(example_input):
 #     # Define input parameters
-#     Lh, x, vol, fh, uexact = squarepoissond(10)
-#     print(Lh)
-#     res = sp.sparse.linalg.spsolve(Lh,fh)
 #
-#     levelsData = [
-#         {
-#             'nodes': x,
-#             'stencilSize': 4,
-#             'rbfOrder': 0,
-#             'rbfPolyDeg': 0,
-#             'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-#             'idx': [],
-#             'Lh': Lh,
-#             'DLh': [],
-#             'I': [],
-#             'R': [],
-#             'Mhf': [],
-#             'Nhf': [],
-#             'Mhb': [],
-#             'Nhb': [],
-#             'preSmooth': 2,
-#             'postSmooth': 2,
-#             'Ihat': 1,
-#             'Rhat': 1,
-#             'w': [],
-#             'Qh': 0
-#         },
-#         # Add more dictionaries for additional levels if needed
-#     ] # Example levelsData
+#  # Example levelsData
 #
 #   # Example right-hand side
-#     tol = 1e-8  # Tolerance
+#     fh = sp.io.loadmat('standalone_data/fh_before_multi.mat')
+#     fh = fh['fh']
+#     tol = 1e-10  # Tolerance
 #     max_iters = 100  # Maximum number of iterations
 #     uh = mgmStruct['uh']  # Input vector
-#     smooths = [2, 2]  # Example smooths
+#     smooths = [1, 1]  # Example smooths
 #     # Instantiate TestMGMImplementation object
 #     mgm_obj = TestMGMImplementation()
 #
 #     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
-#
+#     uh, flag, relres, iters, resvec = mgm_obj.standalone(example_input, fh, tol, max_iters, uh, smooths)
+#     expected_uh = sp.io.loadmat('standalone_data/uh_after_multi.mat')['uh']
+#     expected_resvec = sp.io.loadmat('standalone_data/resvec_after_multi.mat')['resvec']
 #     # Assert the result
 #     assert flag == 0  # Convergence flag
 #     assert relres <= tol  # Relative residual within tolerance
 #     assert iters <= max_iters  # Number of iterations within maximum
+#     assert np.allclose(expected_uh, uh)
+#     assert np.allclose(expected_resvec, resvec)
 #
 #
 # def test_standalone_non_convergence(mgmStruct):
