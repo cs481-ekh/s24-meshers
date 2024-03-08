@@ -3,6 +3,7 @@ import pytest
 import scipy as sp
 from src.pymgm_test.mgm.mgm import  mgm
 from sqrpoisson import squarepoissond
+import os
 
 class TestMGMImplementation(mgm):
     pass
@@ -19,6 +20,13 @@ def mgmStruct():
     uh = np.array([1, 2])  # Example input vector
     return {'uh': uh}  # Wrap Lh array with key 'lh'
 
+
+def construct_file_path(folder_name, file_name):
+    # Construct the file path dynamically based on the current working directory
+    if os.path.basename(os.getcwd()) != 'test':
+        return os.path.join(os.getcwd(), 'test', folder_name, file_name)
+    else:
+        return os.path.join(folder_name, file_name)
 #--------------------------------------------------------------------------------
 #                          AFUN TESTS
 #--------------------------------------------------------------------------------
@@ -105,9 +113,9 @@ def test_afun_empty_vector():
 # #--------------------------------------------------------------------------------
 @pytest.fixture
 def example_input():
-    # Load the .mat file
+    file_path = construct_file_path('multievel_data', 'mgmStruct_before.mat')
+    mat_contents = sp.io.loadmat(file_path)
 
-    mat_contents = sp.io.loadmat('test/multievel_data/mgmStruct_before.mat')
     keys = list(mat_contents.keys())
     print( mat_contents['mgmStruct_before'].shape)
     # Initialize an empty list to store the levelsData
@@ -145,11 +153,14 @@ def example_input():
 def test_multilevel_solution_accuracy(example_input):
 
     smooths = [example_input[0]['preSmooth'][0][0], example_input[0]['postSmooth'][0][0]]
-    fh = sp.io.loadmat('multievel_data/fh_before_multi.mat')
+    file_path = construct_file_path('multievel_data', 'fh_before_multi.mat')
+    fh = sp.io.loadmat(file_path)
     fh = fh['fh']
-    expected_result = sp.io.loadmat('multievel_data/uh_after_multi.mat')
+    file_path = construct_file_path('multievel_data', 'uh_after_multi.mat')
+    expected_result = sp.io.loadmat(file_path)
     expected_result = expected_result['uh'].reshape(-1,1)
-    uh = sp.io.loadmat('multievel_data/uh_before_multi.mat')
+    file_path = construct_file_path('multievel_data', 'uh_before_multi.mat')
+    uh = sp.io.loadmat(file_path)
     uh = uh['uh']
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
