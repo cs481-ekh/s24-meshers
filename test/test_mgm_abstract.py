@@ -281,7 +281,11 @@ def test_standalone_convergence(example_input):
     fh = fh['fh']
     tol = 1e-10  # Tolerance
     max_iters = 100  # Maximum number of iterations
-    uh = mgmStruct['uh']  # Input vector
+
+
+    file_path = construct_file_path('standalone_data', 'uh_before_standalone.mat')
+    uh = sp.io.loadmat(file_path)
+    uh = uh['uh'].reshape(-1,1)
     smooths = [1, 1]  # Example smooths
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
@@ -289,7 +293,7 @@ def test_standalone_convergence(example_input):
     # Call standalone method
     uh, flag, relres, iters, resvec = mgm_obj.standalone(example_input, fh, tol, max_iters, uh, smooths)
     file_path = construct_file_path('standalone_data', 'uh_afterstand.mat')
-    expected_uh = sp.io.loadmat(file_path)['uh']
+    expected_uh = sp.io.loadmat(file_path)['uh'].reshape(-1,1)
 
     file_path = construct_file_path('standalone_data', 'resvec_afterstand.mat')
     expected_resvec = sp.io.loadmat(file_path)['resvec']
@@ -301,14 +305,16 @@ def test_standalone_convergence(example_input):
     assert np.allclose(expected_resvec, resvec)
 
 
-def test_standalone_non_convergence(mgmStruct):
+def test_standalone_non_convergence(example_input):
     # Example right-hand side
     file_path = construct_file_path('standalone_data', 'fh_before_standalone.mat')
     fh = sp.io.loadmat(file_path)
     fh = fh['fh']
     tol = 1e-10  # Tolerance
     max_iters = 14  # Maximum number of iterations
-    uh = mgmStruct['uh']  # Input vector
+    file_path = construct_file_path('standalone_data', 'uh_before_standalone.mat')
+    uh = sp.io.loadmat(file_path)
+    uh = uh['uh'] # Input vector
     smooths = [1, 1]  # Example smooths
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
