@@ -8,6 +8,7 @@ import os
 
 @pytest.mark.skip(reason="Concrete test class for abstract base class testing")
 class TestMGMImplementation(mgm):
+    __test__ = False
     pass
     def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
         pass
