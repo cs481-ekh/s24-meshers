@@ -107,7 +107,7 @@ def test_afun_empty_vector():
 def example_input():
     # Load the .mat file
 
-    mat_contents = sp.io.loadmat('multievel_data/mgmStruct_before.mat')
+    mat_contents = sp.io.loadmat('test/multievel_data/mgmStruct_before.mat')
     keys = list(mat_contents.keys())
     print( mat_contents['mgmStruct_before'].shape)
     # Initialize an empty list to store the levelsData
