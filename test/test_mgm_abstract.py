@@ -5,6 +5,8 @@ from src.pymgm_test.mgm.mgm import  mgm
 from sqrpoisson import squarepoissond
 import os
 
+
+@pytest.mark.skip(reason="Concrete test class for abstract base class testing")
 class TestMGMImplementation(mgm):
     pass
     def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
