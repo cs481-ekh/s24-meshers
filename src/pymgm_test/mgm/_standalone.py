@@ -1,6 +1,6 @@
 import numpy as np
 from ._multilevel import multilevel
-
+import warnings
 
 def standalone(self,mgmStruct, fh, tol, max_iter, uh, smooths):
     iter_count = 0
@@ -13,7 +13,7 @@ def standalone(self,mgmStruct, fh, tol, max_iter, uh, smooths):
 
     while residual > reltol and iter_count < max_iter:
         uh = multilevel(self,fh, mgmStruct, smooths, uh)
-        rh = fh - np.dot(Lh , uh)
+        rh = fh - (Lh.dot(uh))
         iter_count += 1
         residual = np.linalg.norm(rh)
         resvec[iter_count] = residual
@@ -25,7 +25,7 @@ def standalone(self,mgmStruct, fh, tol, max_iter, uh, smooths):
     if iter_count >= max_iter:
         flag = 1
         # Uncomment the line below to raise a warning if needed
-        # warnings.warn('MGM failed to converge in {} iterations, relative residual={:.3e}'.format(max_iter, relres))
+        warnings.warn('MGM failed to converge in {} iterations, relative residual={:.3e}'.format(max_iter, relres))
 
     return uh, flag, relres, iter_count, resvec
 

@@ -70,7 +70,7 @@ def multilevel(self,fh, levelsData, smooths=None, uh=None):
                 nuh = nhf.dot(uh);
                 nuhf = nuh + fh;
                 tmpres = levelsData[lvl-1]['Nhf'].dot(uh) + fh
-                solution = spsolve(levelsData[lvl-1]['Mhf'], tmpres)
+                solution = spsolve(levelsData[lvl-1]['Mhf'], tmpres).reshape(-1, 1)
                 uh = solution
                 # uh = np.linalg.solve(levelsData[lvl]['Mhf'], np.dot(levelsData[lvl]['Nhf'], uh) + fh)
                 # uh = np.linalg.solve(levelsData[lvl]['Mhb'], np.dot(levelsData[lvl]['Nhb'], uh) + fh)

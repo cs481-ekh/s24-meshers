@@ -30,9 +30,9 @@ def construct_file_path(folder_name, file_name):
         return os.path.join(os.getcwd(), 'test', folder_name, file_name)
     else:
         return os.path.join(folder_name, file_name)
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 #                          AFUN TESTS
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 def test_afun_square_matrix(mgmStruct):
     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
 
@@ -111,9 +111,9 @@ def test_afun_empty_vector():
         mgm_obj.afun(mgmStruct['uh'], mgmobj)
 
 
-# #--------------------------------------------------------------------------------
-# #                          MULTILEVEL TESTS
-# #--------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
+#                          MULTILEVEL TESTS
+#--------------------------------------------------------------------------------
 @pytest.fixture
 def example_input():
     file_path = construct_file_path('multievel_data', 'mgmStruct_before.mat')
@@ -201,9 +201,9 @@ def test_multilevel_non_matching_dimensions():
     with pytest.raises(ValueError):
         mgm_obj.multilevel(fh, levelsData, smooths, uh)
 
-# # #--------------------------------------------------------------------------------
-# # #                          SOlVE TESTS
-# # #--------------------------------------------------------------------------------
+# #--------------------------------------------------------------------------------
+# #                          SOlVE TESTS
+# #--------------------------------------------------------------------------------
 # @pytest.fixture
 # def mgmStruct1():
 #     nodes = np.array([[0, 0], [1, 0], [0, 1]])  # Example nodes
@@ -268,213 +268,85 @@ def test_multilevel_non_matching_dimensions():
 #     assert isinstance(relres, float)
 #     assert isinstance(iters, int)
 #     assert isinstance(resvec, np.ndarray)
-#
-#
-#
-# #--------------------------------------------------------------------------------
-# #                          STANDALONE TESTS
-# #--------------------------------------------------------------------------------
-# def test_standalone_convergence(example_input):
-#     # Define input parameters
-#
-#  # Example levelsData
-#
-#   # Example right-hand side
-#     fh = sp.io.loadmat('standalone_data/fh_before_multi.mat')
-#     fh = fh['fh']
-#     tol = 1e-10  # Tolerance
-#     max_iters = 100  # Maximum number of iterations
-#     uh = mgmStruct['uh']  # Input vector
-#     smooths = [1, 1]  # Example smooths
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(example_input, fh, tol, max_iters, uh, smooths)
-#     expected_uh = sp.io.loadmat('standalone_data/uh_after_multi.mat')['uh']
-#     expected_resvec = sp.io.loadmat('standalone_data/resvec_after_multi.mat')['resvec']
-#     # Assert the result
-#     assert flag == 0  # Convergence flag
-#     assert relres <= tol  # Relative residual within tolerance
-#     assert iters <= max_iters  # Number of iterations within maximum
-#     assert np.allclose(expected_uh, uh)
-#     assert np.allclose(expected_resvec, resvec)
-#
-#
-# def test_standalone_non_convergence(mgmStruct):
-#     # Define input parameters
-#     levelsData = [
-#         {
-#             'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
-#             'stencilSize': 4,
-#             'rbfOrder': 0,
-#             'rbfPolyDeg': 0,
-#             'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-#             'idx': [],
-#             'Lh': [],
-#             'DLh': [],
-#             'I': [],
-#             'R': [],
-#             'Mhf': [],
-#             'Nhf': [],
-#             'Mhb': [],
-#             'Nhb': [],
-#             'preSmooth': 2,
-#             'postSmooth': 2,
-#             'Ihat': 1,
-#             'Rhat': 1,
-#             'w': [],
-#             'Qh': 0
-#         },
-#         # Add more dictionaries for additional levels if needed
-#     ]
-#     # Example levelsData
-#     fh = np.array([[1, 2], [3,4]])  # Example right-hand side
-#   # Example right-hand side
-#     tol = 1e-8  # Tolerance
-#     max_iters = 10  # Maximum number of iterations (set intentionally low for non-convergence)
-#     uh = mgmStruct['uh']  # Input vector
-#     smooths = [2, 2]  # Example smooths
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
-#
-#     # Assert the result
-#     assert flag == 1  # Non-convergence flag
-#     assert relres > tol  # Relative residual exceeds tolerance
-#     assert iters == max_iters  # Maximum iterations reached
-#
-# def test_standalone_empty_input(mgmStruct):
-#     # Define empty input parameters
-#     levelsData = [
-#         {
-#             'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
-#             'stencilSize': 4,
-#             'rbfOrder': 0,
-#             'rbfPolyDeg': 0,
-#             'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-#             'idx': [],
-#             'Lh': [],
-#             'DLh': [],
-#             'I': [],
-#             'R': [],
-#             'Mhf': [],
-#             'Nhf': [],
-#             'Mhb': [],
-#             'Nhb': [],
-#             'preSmooth': 2,
-#             'postSmooth': 2,
-#             'Ihat': 1,
-#             'Rhat': 1,
-#             'w': [],
-#             'Qh': 0
-#         },
-#         # Add more dictionaries for additional levels if needed
-#     ] # Empty levelsData
-#     fh = np.array([])  # Empty right-hand side
-#     tol = 1e-8  # Tolerance
-#     max_iters = 100  # Maximum number of iterations
-#     uh = np.array([])  # Empty input vector
-#     smooths = [2, 2]  # Example smooths
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
-#
-#     # Assert the result
-#     assert flag == 0  # Empty input should converge immediately
-#     assert relres == 0  # Relative residual should be zero
-#     assert iters == 0  # No iterations needed
-#
-# def test_standalone_zero_tolerance(mgmStruct):
-#     # Define input parameters with zero tolerance
-#     levelsData = [
-#         {
-#             'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
-#             'stencilSize': 4,
-#             'rbfOrder': 0,
-#             'rbfPolyDeg': 0,
-#             'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-#             'idx': [],
-#             'Lh': [],
-#             'DLh': [],
-#             'I': [],
-#             'R': [],
-#             'Mhf': [],
-#             'Nhf': [],
-#             'Mhb': [],
-#             'Nhb': [],
-#             'preSmooth': 2,
-#             'postSmooth': 2,
-#             'Ihat': 1,
-#             'Rhat': 1,
-#             'w': [],
-#             'Qh': 0
-#         },
-#         # Add more dictionaries for additional levels if needed
-#     ]  # Example levelsData
-#     fh = np.array([1, 1, 1])  # Example right-hand side
-#     tol = 0  # Zero tolerance
-#     max_iters = 100  # Maximum number of iterations
-#     uh = mgmStruct['uh']  # Input vector
-#     smooths = [2, 2]  # Example smooths
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
-#
-#     # Assert the result
-#     assert flag == 0  # Convergence flag
-#     assert relres == 0  # Relative residual should be zero regardless of tolerance
-#     assert iters == 0  # No iterations needed with zero tolerance
-#
-# def test_standalone_small_system(mgmStruct):
-#     # Define input parameters for a very small system
-#     levelsData = [
-#         {
-#             'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
-#             'stencilSize': 4,
-#             'rbfOrder': 0,
-#             'rbfPolyDeg': 0,
-#             'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-#             'idx': [],
-#             'Lh': [],
-#             'DLh': [],
-#             'I': [],
-#             'R': [],
-#             'Mhf': [],
-#             'Nhf': [],
-#             'Mhb': [],
-#             'Nhb': [],
-#             'preSmooth': 2,
-#             'postSmooth': 2,
-#             'Ihat': 1,
-#             'Rhat': 1,
-#             'w': [],
-#             'Qh': 0
-#         },
-#         # Add more dictionaries for additional levels if needed
-#     ]  # Single-element levelsData
-#     fh = np.array([1])  # Single-element right-hand side
-#     tol = 1e-8  # Tolerance
-#     max_iters = 100  # Maximum number of iterations
-#     uh = np.array([1])  # Single-element input vector
-#     smooths = [2, 2]  # Example smooths
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call standalone method
-#     uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
-#
-#     # Assert the result
-#     assert flag == 0  # Convergence flag
-#     assert relres == 0  # Relative residual should be zero for such a small system
-#     assert iters == 0  # No iterations needed for such a small system
+
+
+
+#--------------------------------------------------------------------------------
+#                          STANDALONE TESTS
+#--------------------------------------------------------------------------------
+def test_standalone_convergence(example_input):
+  # Example right-hand side
+    file_path = construct_file_path('standalone_data', 'fh_before_standalone.mat')
+    fh = sp.io.loadmat(file_path)
+    fh = fh['fh']
+    tol = 1e-10  # Tolerance
+    max_iters = 100  # Maximum number of iterations
+
+
+    file_path = construct_file_path('standalone_data', 'uh_before_standalone.mat')
+    uh = sp.io.loadmat(file_path)
+    uh = uh['uh'].reshape(-1,1)
+    smooths = [1, 1]  # Example smooths
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    uh, flag, relres, iters, resvec = mgm_obj.standalone(example_input, fh, tol, max_iters, uh, smooths)
+    file_path = construct_file_path('standalone_data', 'uh_afterstand.mat')
+    expected_uh = sp.io.loadmat(file_path)['uh'].reshape(-1,1)
+
+    file_path = construct_file_path('standalone_data', 'resvec_afterstand.mat')
+    expected_resvec = sp.io.loadmat(file_path)['resvec']
+    # Assert the result
+    assert flag == 0  # Convergence flag
+    assert relres <= tol  # Relative residual within tolerance
+    assert iters <= max_iters  # Number of iterations within maximum
+    assert np.allclose(expected_uh, uh)
+    assert np.allclose(expected_resvec, resvec)
+
+
+def test_standalone_non_convergence(example_input):
+    # Example right-hand side
+    file_path = construct_file_path('standalone_data', 'fh_before_standalone.mat')
+    fh = sp.io.loadmat(file_path)
+    fh = fh['fh']
+    tol = 1e-10  # Tolerance
+    max_iters = 14  # Maximum number of iterations
+    file_path = construct_file_path('standalone_data', 'uh_before_standalone.mat')
+    uh = sp.io.loadmat(file_path)
+    uh = uh['uh'] # Input vector
+    smooths = [1, 1]  # Example smooths
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    with pytest.warns(UserWarning):
+        uh, flag, relres, iters, resvec = mgm_obj.standalone(example_input, fh, tol, max_iters, uh, smooths)
+
+    file_path = construct_file_path('standalone_data', 'uh_afterstand_nonconverge.mat')
+    expected_uh = sp.io.loadmat(file_path)['uh']
+
+    file_path = construct_file_path('standalone_data', 'resvec_afterstand_nonconverge.mat')
+    expected_resvec = sp.io.loadmat(file_path)['resvec']
+    # Assert the result
+    assert flag == 1  # Convergence flag
+    assert relres > tol  # Relative residual within tolerance
+    assert iters <= max_iters  # Number of iterations within maximum
+    assert np.allclose(expected_uh, uh)
+    assert np.allclose(expected_resvec, resvec)
+
+def test_standalone_empty_input(mgmStruct):
+    # Define empty input parameters
+    fh = np.array([])  # Empty right-hand side
+    tol = 1e-8  # Tolerance
+    max_iters = 100  # Maximum number of iterations
+    uh = np.array([])  # Empty input vector
+    smooths = [1, 1]  # Example smooths
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call standalone method
+    # uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
+    with pytest.raises(IndexError):
+         mgm_obj.standalone(np.array([]), fh, tol, max_iters, uh, smooths)
