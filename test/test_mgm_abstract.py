@@ -328,38 +328,13 @@ def test_standalone_non_convergence(example_input):
     expected_resvec = sp.io.loadmat(file_path)['resvec']
     # Assert the result
     assert flag == 1  # Convergence flag
-    assert relres <= tol  # Relative residual within tolerance
+    assert relres > tol  # Relative residual within tolerance
     assert iters <= max_iters  # Number of iterations within maximum
     assert np.allclose(expected_uh, uh)
     assert np.allclose(expected_resvec, resvec)
 
 def test_standalone_empty_input(mgmStruct):
     # Define empty input parameters
-    levelsData = [
-        {
-            'nodes': np.array([[0, 0], [1, 0], [0, 1]]),
-            'stencilSize': 4,
-            'rbfOrder': 0,
-            'rbfPolyDeg': 0,
-            'rbf': 0,  # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
-            'idx': [],
-            'Lh': [],
-            'DLh': [],
-            'I': [],
-            'R': [],
-            'Mhf': [],
-            'Nhf': [],
-            'Mhb': [],
-            'Nhb': [],
-            'preSmooth': 2,
-            'postSmooth': 2,
-            'Ihat': 1,
-            'Rhat': 1,
-            'w': [],
-            'Qh': 0
-        },
-        # Add more dictionaries for additional levels if needed
-    ] # Empty levelsData
     fh = np.array([])  # Empty right-hand side
     tol = 1e-8  # Tolerance
     max_iters = 100  # Maximum number of iterations
@@ -372,4 +347,4 @@ def test_standalone_empty_input(mgmStruct):
     # Call standalone method
     # uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
     with pytest.raises(IndexError):
-         mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
+         mgm_obj.standalone(np.array([]), fh, tol, max_iters, uh, smooths)
