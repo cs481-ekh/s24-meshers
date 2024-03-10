@@ -283,25 +283,28 @@ def test_solve_no_acceleration_default_parameters(mgmObj):
     assert np.allclose(expected_resvec, resvec)
 
 
-def test_solve_no_acceleration_custom_parameters(mgmObj):
-    # Define input parameters
-    fh = np.array([1, 1, 1])  # Example right-hand side
-    tol = 1e-5  # Custom tolerance
-    maxIters = 50  # Custom maximum number of iterations
-    accel = 'none'  # No acceleration
+def test_solve_bicgstab_accel(mgmObj):
+    file_path = construct_file_path('solve_data', 'fh_before_solve_bicgstab.mat')
+    fh = sp.io.loadmat(file_path)['fh']
+    expected_uh = sp.io.loadmat(construct_file_path('solve_data', 'uh_after_solve_bicgstab.mat'))['uh']
+    expected_relres = sp.io.loadmat(construct_file_path('solve_data', 'relres_after_solve_bicgstab.mat'))['relres'][0][0]
+    expected_resvec = sp.io.loadmat(construct_file_path('solve_data', 'resvec_after_solve.mat_bicgstab'))['resvec']
+    tol = 1e-10  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
+    accel = 'bicgstab'
 
     # Instantiate TestMGMImplementation object
     mgm_obj = TestMGMImplementation()
 
-    # Call solve method with no acceleration and custom parameters
-    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj, fh, tol, accel, maxIters)
+    # Call solve method with no acceleration and default parameters
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj,fh, tol, accel, maxIters )
 
     # Assert the result dimensions
-    assert uh.shape == fh.shape
-    assert isinstance(flag, int)
-    assert isinstance(relres, float)
-    assert isinstance(iters, int)
-    assert isinstance(resvec, np.ndarray)
+    assert np.allclose(expected_uh, uh)
+    assert flag == 0
+    assert np.allclose(expected_relres, relres)
+    assert iters == 15
+    assert np.allclose(expected_resvec, resvec)
 
 def test_solve_no_acceleration_large_system(mgmObj):
     # Test with a larger system
