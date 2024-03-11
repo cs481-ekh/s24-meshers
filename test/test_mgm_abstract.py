@@ -14,15 +14,6 @@ class TestMGMImplementation(mgm):
         pass
 
 
-class Struct:
-    def __init__(self, Lh):
-        self.Lh = Lh
-
-@pytest.fixture
-def mgmStruct():
-    uh = np.array([1, 2])  # Example input vector
-    return {'uh': uh}  # Wrap Lh array with key 'lh'
-
 
 def construct_file_path(folder_name, file_name):
     # Construct the file path dynamically based on the current working directory
@@ -33,84 +24,75 @@ def construct_file_path(folder_name, file_name):
 # --------------------------------------------------------------------------------
 #                          AFUN TESTS
 # --------------------------------------------------------------------------------
-# def test_afun_square_matrix(mgmStruct):
-#     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-#
-#     # Create instances of the Struct class with different Lh arrays
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call afun method with mgmStruct
-#     result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#     # Perform manual matrix-vector multiplication for validation
-#     expected_result = np.array([5, 11])
-#
-#     # Assert that the result matches the expected result
-#     assert np.array_equal(result, expected_result)
-#
-# def test_afun_non_square_matrix(mgmStruct):
-#     Lh = np.array([[1, 2], [3, 4], [5, 6]])  # Adjusted Lh to 3x2 matrix
-#
-#     # Create instances of the Struct class with different Lh arrays
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call afun method with mgmStruct
-#     result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#     # Perform manual matrix-vector multiplication for validation
-#     expected_result = np.array([5, 11, 17])  # Adjusted expected result for the 3x2 matrix
-#
-#     # Assert that the result matches the expected result
-#     assert np.array_equal(result, expected_result)
-#
-# def test_afun_empty_matrix(mgmStruct):
-#     Lh = np.empty((0, 0))  # Empty matrix
-#
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Assert that calling afun with an empty matrix raises an exception
-#     with pytest.raises(Exception):
-#         mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-# def test_afun_empty_vector():
-#     Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-#     uh = np.empty((0,))  # Empty input vector
-#
-#     struct1 = Struct(Lh)
-#     struct2 = Struct(Lh)
-#
-#     # Create a list of the struct instances
-#     mgmobj = [struct1, struct2]
-#
-#     # Instantiate mgm object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Assert that calling afun with an empty matrix raises an exception
-#     with pytest.raises(Exception):
-#         mgm_obj.afun(mgmStruct['uh'], mgmobj)
-#
-#
+def test_afun_square_matrix(mgmObj):
+    Lh = mgmObj[4]['levelsData'][0]['Lh']  # Example square matrix representing discretization
+    uh = np.zeros(2401).reshape(-1,1)  # Example input vector
+
+    # Create a list of the struct instances
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Call afun method with mgmStruct
+    result = mgm_obj.afun(uh, mgmObj)
+
+    # Perform manual matrix-vector multiplication for validation
+    expected_result = sp.io.loadmat(construct_file_path('afun_data', 'uh_after_afun_bicgstab.mat'))['uh']
+
+    # Assert that the result matches the expected result
+    assert np.array_equal(result, expected_result)
+
+def test_afun_non_square_matrix(mgmObj):
+    original_Lh = mgmObj[4]['levelsData'][0]['Lh']
+
+    # Calculate the total number of elements and the desired number of columns
+    total_elements = 2401 *2401
+    num_cols = 49  # For example, choose any number of columns you desire
+
+    # Calculate the number of rows needed
+    num_rows = total_elements // num_cols
+    if total_elements % num_cols != 0:
+        num_rows += 1
+    mgmobj = mgmObj
+    mgmobj[4]['levelsData'][0]['Lh'] = mgmobj[4]['levelsData'][0]['Lh'].reshape(num_rows, num_cols)
+    uh = np.zeros(num_cols).reshape(-1,1)  # Example input vector
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Call afun method with mgmStruct
+    result = mgm_obj.afun(uh, mgmobj)
+
+    # Perform manual matrix-vector multiplication for validation
+    expected_result =  np.zeros((117649,1)) # Adjusted expected result for the 3x2 matrix
+
+    # Assert that the result matches the expected result
+    assert np.array_equal(result, expected_result)
+
+def test_afun_empty_matrix(mgmObj):
+    mgmobj = mgmObj
+    mgmobj[4]['levelsData'][0]['Lh'] = np.empty((0, 0))  # Empty matrix
+    uh = uh = np.zeros(2401).reshape(-1,1)   # Example input vector
+
+
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(uh, mgmobj)
+
+def test_afun_empty_vector():
+    mgmobj = mgmObj
+    uh = np.empty((0, 0))
+    # Instantiate mgm object
+    mgm_obj = TestMGMImplementation()
+
+    # Assert that calling afun with an empty matrix raises an exception
+    with pytest.raises(Exception):
+        mgm_obj.afun(uh, mgmobj)
+
+
 # #--------------------------------------------------------------------------------
 # #                          MULTILEVEL TESTS
 # #--------------------------------------------------------------------------------
