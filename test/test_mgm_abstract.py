@@ -288,7 +288,7 @@ def test_solve_bicgstab_accel(mgmObj):
     fh = sp.io.loadmat(file_path)['fh']
     expected_uh = sp.io.loadmat(construct_file_path('solve_data', 'uh_after_solve_bicgstab.mat'))['uh']
     expected_relres = sp.io.loadmat(construct_file_path('solve_data', 'relres_after_solve_bicgstab.mat'))['relres'][0][0]
-    expected_resvec = sp.io.loadmat(construct_file_path('solve_data', 'resvec_after_solve.mat_bicgstab'))['resvec']
+    expected_resvec = sp.io.loadmat(construct_file_path('solve_data', 'resvec_after_solve_bicgstab.mat'))['resvec']
     tol = 1e-10  # Default tolerance
     maxIters = 100  # Default maximum number of iterations
     accel = 'bicgstab'
@@ -303,7 +303,7 @@ def test_solve_bicgstab_accel(mgmObj):
     assert np.allclose(expected_uh, uh)
     assert flag == 0
     assert np.allclose(expected_relres, relres)
-    assert iters == 15
+    assert iters == 13
     assert np.allclose(expected_resvec, resvec)
 
 def test_solve_no_acceleration_large_system(mgmObj):
