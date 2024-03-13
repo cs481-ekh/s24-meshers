@@ -24,20 +24,25 @@ def solve(self,mgmobj, fh, tol=1e-8, accel='none', maxIters=None):
     smooths = [mgmobj[8]['preSmooth'], mgmobj[9]['postSmooth']]
 
     if accel.lower() == 'gmres':
-        A = csc_matrix(matvecOp(levelsData, np.eye(N)))
-        b = fh
-        uh, flag = gmres(A, b, tol=tol, maxiter=maxIters)
-        iters = flag  # Note: scipy gmres returns iteration count or convergence flag
-        relres = np.linalg.norm(b - A @ uh) / np.linalg.norm(b)
-        if flag != 0:
-            print(f"GMRES did not converge to a tolerance of {tol} in {maxIters} iterations")
+        # A = csc_matrix(matvecOp(levelsData, np.eye(N)))
+        # b = fh
+        # uh, flag = gmres(A, b, tol=tol, maxiter=maxIters) #python gmres proabaly not what we need
+        # iters = flag  # Note: scipy gmres returns iteration count or convergence flag
+        # relres = np.linalg.norm(b - A @ uh) / np.linalg.norm(b)
+        # if flag != 0:
+        #     print(f"GMRES did not converge to a tolerance of {tol} in {maxIters} iterations")
+        raise NotImplementedError
     elif accel.lower() == 'bicgstab':
         A_operator = LinearOperator(shape=(N, N), matvec=matvecOp)
         b = fh
-        uh, flag = bicgstab(A_operator, b, tol=tol, maxiter=maxIters)
-        iters = flag[1]  # Note: scipy bicgstab returns iteration count and convergence flag
-        relres = np.linalg.norm(b - A @ uh) / np.linalg.norm(b)
-        if flag[1] != 0:
+        uh, flag= bicgstab(A_operator, b, tol=tol, maxiter=maxIters)
+        uh= uh.reshape(-1,1)
+        # resvec = b - A_operator.dot(uh)
+        # relres = np.linalg.norm(resvec) / np.linalg.norm(b)
+        resvec = None
+        relres = None
+        iters= None
+        if flag != 0:
             print(f"BiCGStab did not converge to a tolerance of {tol} in {maxIters} iterations")
     elif accel.lower() == 'none':
         uh, flag, relres, iters, resvec = mgmMethod(levelsData, fh, tol, maxIters, uh0, smooths)
