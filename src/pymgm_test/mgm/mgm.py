@@ -23,7 +23,38 @@ class mgm(ABC):
 
 
 
+    # Example usage:
+    # uh, flag, relres, iters = solve(mgmobj, fh, tol=1e-8, accel='bicgstab', maxIters=100)
     def solve(self, mgmobj, fh, tol=1e-8, accel='none', maxIters=None):
+        """
+        Solves a linear system arising from the discretization of an elliptic equation using the MGM method.
+
+        Parameters:
+            mgmobj : mgm
+                Instance of an MGM class for a matrix Lh.
+            fh : array_like
+                Right-hand side of the linear system.
+            tol : float
+                Tolerance on the relative residual for determining when the system is "solved".
+            accel : str, optional
+                Acceleration method to use with MGM. Options are 'none' (default), 'gmres', and 'bicgstab'.
+                In the latter two cases, MGM is used as a left preconditioner.
+            maxIters : int, optional
+                Maximum number of iterations to use when solving the system. Default is 100.
+
+        Returns:
+            uh : array_like
+                Approximate solution to the linear system.
+            flag : int
+                Flag indicating if the tolerance on the relative residual was reached: 0 for 'Yes', 1 for 'No'.
+            relres : float
+                Relative residual for the computed solution.
+            iters : int
+                Number of iterations to reach relative residual.
+            resvec : array_like
+                Residual of the approximate solutions at each iteration.
+        """
+
         levelsData = mgmobj[4]['levelsData']
         N = levelsData[0]['nodes'].shape[0]
 
@@ -74,8 +105,10 @@ class mgm(ABC):
 
         return uh, flag, relres, iters, resvec
 
-    # Example usage:
-    # uh, flag, relres, iters = solve(mgmobj, fh, tol=1e-8, accel='bicgstab', maxIters=100)
+
+
+
+
 
     def multilevel(self, fh, levelsData, smooths=None, uh=None):
         num_vcycles = 1

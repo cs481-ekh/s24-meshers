@@ -255,7 +255,7 @@ def test_solve_no_acceleration_default_parameters(mgmObj):
     mgm_obj = TestMGMImplementation()
 
     # Call solve method with no acceleration and default parameters
-    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj,fh, tol, accel, maxIters )
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj,fh, tol, accel=accel, maxIters=maxIters)
 
     # Assert the result dimensions
     assert np.allclose(expected_uh, uh)
