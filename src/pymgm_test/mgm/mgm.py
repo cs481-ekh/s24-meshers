@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
 import numpy as np
-from scipy.sparse.linalg import spsolve
+from scipy.sparse.linalg import spsolve,  bicgstab, LinearOperator
 import warnings
 
 class mgm(ABC):
@@ -22,8 +22,60 @@ class mgm(ABC):
         return res  # Assuming mgmobj is an array-like object with Lh attribute
 
 
-    from .solve import solve
 
+    def solve(self, mgmobj, fh, tol=1e-8, accel='none', maxIters=None):
+        levelsData = mgmobj[4]['levelsData']
+        N = levelsData[0]['nodes'].shape[0]
+
+        if maxIters is None:
+            maxIters = mgmobj[10]['maxIters']
+
+        if mgmobj[11]['hasConstNullSpace']:
+            fh = np.append(fh, 0)
+            uh0 = np.zeros(N + 1)
+            mgmOp = self.multilevelcon
+            matvecOp = self.afuncon
+            mgmMethod = self.standalonecon
+        else:
+            uh0 = np.zeros(N).reshape(-1, 1)
+            mgmOp = self.multilevel
+            matvecOp = lambda x: self.afun(x, mgmobj)
+            mgmMethod = self.standalone
+
+        smooths = [mgmobj[8]['preSmooth'], mgmobj[9]['postSmooth']]
+
+        if accel.lower() == 'gmres':
+            # A = csc_matrix(matvecOp(levelsData, np.eye(N)))
+            # b = fh
+            # uh, flag = gmres(A, b, tol=tol, maxiter=maxIters) #python gmres proabaly not what we need
+            # iters = flag  # Note: scipy gmres returns iteration count or convergence flag
+            # relres = np.linalg.norm(b - A @ uh) / np.linalg.norm(b)
+            # if flag != 0:
+            #     print(f"GMRES did not converge to a tolerance of {tol} in {maxIters} iterations")
+            raise NotImplementedError
+        elif accel.lower() == 'bicgstab':
+            A_operator = LinearOperator(shape=(N, N), matvec=matvecOp)
+            b = fh
+            uh, flag = bicgstab(A_operator, b, tol=tol, maxiter=maxIters)
+            uh = uh.reshape(-1, 1)
+            # resvec = b - A_operator.dot(uh)
+            # relres = np.linalg.norm(resvec) / np.linalg.norm(b)
+            resvec = None
+            relres = None
+            iters = None
+            if flag != 0:
+                print(f"BiCGStab did not converge to a tolerance of {tol} in {maxIters} iterations")
+        elif accel.lower() == 'none':
+            uh, flag, relres, iters, resvec = mgmMethod(levelsData, fh, tol, maxIters, uh0, smooths)
+            if flag != 0:
+                print(f"MGM did not converge to a tolerance of {tol} in {maxIters} iterations")
+        else:
+            raise ValueError(f"Unknown acceleration option {accel}. Choices are none, gmres, or bicgstab")
+
+        return uh, flag, relres, iters, resvec
+
+    # Example usage:
+    # uh, flag, relres, iters = solve(mgmobj, fh, tol=1e-8, accel='bicgstab', maxIters=100)
 
     def multilevel(self, fh, levelsData, smooths=None, uh=None):
         num_vcycles = 1
