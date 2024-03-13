@@ -34,13 +34,13 @@ class mgm(ABC):
                 Instance of an MGM class for a matrix Lh.
             fh : array_like
                 Right-hand side of the linear system.
-            tol : float
-                Tolerance on the relative residual for determining when the system is "solved".
+            tol : float, optional
+                Tolerance on the relative residual for determining when the system is "solved". Default is 1e-8.
             accel : str, optional
                 Acceleration method to use with MGM. Options are 'none' (default), 'gmres', and 'bicgstab'.
                 In the latter two cases, MGM is used as a left preconditioner.
             maxIters : int, optional
-                Maximum number of iterations to use when solving the system. Default is 100.
+                Maximum number of iterations to use when solving the system. Default is None.
 
         Returns:
             uh : array_like
@@ -53,6 +53,22 @@ class mgm(ABC):
                 Number of iterations to reach relative residual.
             resvec : array_like
                 Residual of the approximate solutions at each iteration.
+
+        Examples:
+        ```
+        # Example usage with default parameters
+        uh, flag, relres, iters, resvec = solve(mgmobj, fh)
+        ```
+
+        ```
+        # Example usage with specified tolerance and acceleration method
+        uh, flag, relres, iters, resvec = solve(mgmobj, fh, tol=1e-6, accel='gmres')
+        ```
+
+        ```
+        # Example usage with maximum number of iterations specified
+        uh, flag, relres, iters, resvec = solve(mgmobj, fh, maxIters=200)
+        ```
         """
 
         levelsData = mgmobj[4]['levelsData']
