@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
-
+import numpy as np
 
 class mgm(ABC):
     def __init__(self):
@@ -12,7 +12,12 @@ class mgm(ABC):
         self.max_iters = 100
         self.has_const_nullspace = False
 
-    from ._afun import afun
+
+
+    def afun(self, uh, mgmobj):
+        Lh = mgmobj[4]['levelsData'][0]['Lh']
+        res = Lh.dot(uh)
+        return res  # Assuming mgmobj is an array-like object with Lh attribute
     from .solve import solve
     from ._multilevel import multilevel
     from ._standalone import standalone
