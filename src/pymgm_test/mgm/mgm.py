@@ -132,6 +132,9 @@ class mgm(ABC):
             warnings.warn('MGM failed to converge in {} iterations, relative residual={:.3e}'.format(max_iter, relres))
 
         return uh, flag, relres, iter_count, resvec
+
+
+
     from ._multilevelcon import multilevelcon
     from ._standalonecon import standalonecon
     from ._afuncon import afuncon
