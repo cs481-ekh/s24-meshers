@@ -13,16 +13,12 @@ class mgm(ABC):
         self.has_const_nullspace = False
 
     from ._afun import afun
-    from ._solve import solve
+    from .solve import solve
     from ._multilevel import multilevel
     from ._standalone import standalone
-
-    def afuncon(self):
-        pass
-    def multilevelcon(self):
-        pass
-    def standalonecon(self):
-        pass
+    from ._multilevelcon import multilevelcon
+    from ._standalonecon import standalonecon
+    from ._afuncon import afuncon
     @abstractmethod
     def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
         pass

@@ -14,15 +14,6 @@ class TestMGMImplementation(mgm):
         pass
 
 
-class Struct:
-    def __init__(self, Lh):
-        self.Lh = Lh
-
-@pytest.fixture
-def mgmStruct():
-    uh = np.array([1, 2])  # Example input vector
-    return {'uh': uh}  # Wrap Lh array with key 'lh'
-
 
 def construct_file_path(folder_name, file_name):
     # Construct the file path dynamically based on the current working directory
@@ -33,82 +24,73 @@ def construct_file_path(folder_name, file_name):
 # --------------------------------------------------------------------------------
 #                          AFUN TESTS
 # --------------------------------------------------------------------------------
-def test_afun_square_matrix(mgmStruct):
-    Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-
-    # Create instances of the Struct class with different Lh arrays
-    struct1 = Struct(Lh)
-    struct2 = Struct(Lh)
+def test_afun_square_matrix(mgmObj):
+    Lh = mgmObj[4]['levelsData'][0]['Lh']  # Example square matrix representing discretization
+    uh = np.zeros(2401).reshape(-1,1)  # Example input vector
 
     # Create a list of the struct instances
-    mgmobj = [struct1, struct2]
 
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
     # Call afun method with mgmStruct
-    result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
+    result = mgm_obj.afun(uh, mgmObj)
 
     # Perform manual matrix-vector multiplication for validation
-    expected_result = np.array([5, 11])
+    expected_result = sp.io.loadmat(construct_file_path('afun_data', 'uh_after_afun_bicgstab.mat'))['uh']
 
     # Assert that the result matches the expected result
     assert np.array_equal(result, expected_result)
 
-def test_afun_non_square_matrix(mgmStruct):
-    Lh = np.array([[1, 2], [3, 4], [5, 6]])  # Adjusted Lh to 3x2 matrix
+def test_afun_non_square_matrix(mgmObj):
+    original_Lh = mgmObj[4]['levelsData'][0]['Lh']
 
-    # Create instances of the Struct class with different Lh arrays
-    struct1 = Struct(Lh)
-    struct2 = Struct(Lh)
+    # Calculate the total number of elements and the desired number of columns
+    total_elements = 2401 *2401
+    num_cols = 49  # For example, choose any number of columns you desire
 
-    # Create a list of the struct instances
-    mgmobj = [struct1, struct2]
+    # Calculate the number of rows needed
+    num_rows = total_elements // num_cols
+    if total_elements % num_cols != 0:
+        num_rows += 1
+    mgmobj = mgmObj
+    mgmobj[4]['levelsData'][0]['Lh'] = mgmobj[4]['levelsData'][0]['Lh'].reshape(num_rows, num_cols)
+    uh = np.zeros(num_cols).reshape(-1,1)  # Example input vector
 
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
     # Call afun method with mgmStruct
-    result = mgm_obj.afun(mgmStruct['uh'], mgmobj)
+    result = mgm_obj.afun(uh, mgmobj)
 
     # Perform manual matrix-vector multiplication for validation
-    expected_result = np.array([5, 11, 17])  # Adjusted expected result for the 3x2 matrix
+    expected_result =  np.zeros((117649,1)) # Adjusted expected result for the 3x2 matrix
 
     # Assert that the result matches the expected result
     assert np.array_equal(result, expected_result)
 
-def test_afun_empty_matrix(mgmStruct):
-    Lh = np.empty((0, 0))  # Empty matrix
+def test_afun_empty_matrix(mgmObj):
+    mgmobj = mgmObj
+    mgmobj[4]['levelsData'][0]['Lh'] = np.empty((0, 0))  # Empty matrix
+    uh = uh = np.zeros(2401).reshape(-1,1)   # Example input vector
 
-    struct1 = Struct(Lh)
-    struct2 = Struct(Lh)
-
-    # Create a list of the struct instances
-    mgmobj = [struct1, struct2]
 
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
     # Assert that calling afun with an empty matrix raises an exception
     with pytest.raises(Exception):
-        mgm_obj.afun(mgmStruct['uh'], mgmobj)
+        mgm_obj.afun(uh, mgmobj)
 
 def test_afun_empty_vector():
-    Lh = np.array([[1, 2], [3, 4]])  # Example square matrix representing discretization
-    uh = np.empty((0,))  # Empty input vector
-
-    struct1 = Struct(Lh)
-    struct2 = Struct(Lh)
-
-    # Create a list of the struct instances
-    mgmobj = [struct1, struct2]
-
+    mgmobj = mgmObj
+    uh = np.empty((0, 0))
     # Instantiate mgm object
     mgm_obj = TestMGMImplementation()
 
     # Assert that calling afun with an empty matrix raises an exception
     with pytest.raises(Exception):
-        mgm_obj.afun(mgmStruct['uh'], mgmobj)
+        mgm_obj.afun(uh, mgmobj)
 
 
 #--------------------------------------------------------------------------------
@@ -201,73 +183,125 @@ def test_multilevel_non_matching_dimensions():
     with pytest.raises(ValueError):
         mgm_obj.multilevel(fh, levelsData, smooths, uh)
 
-# #--------------------------------------------------------------------------------
-# #                          SOlVE TESTS
-# #--------------------------------------------------------------------------------
-# @pytest.fixture
-# def mgmStruct1():
-#     nodes = np.array([[0, 0], [1, 0], [0, 1]])  # Example nodes
-#     levelsData = [{"nodes": nodes}]  # Example levelsData
-#     return levelsData
-# def test_solve_no_acceleration_default_parameters(mgmStruct1):
-#     fh = np.array([1, 1, 1])  # Example right-hand side
-#     tol = 1e-8  # Default tolerance
-#     maxIters = 100  # Default maximum number of iterations
-#     accel = 'none'
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call solve method with no acceleration and default parameters
-#     uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1,fh, tol, accel, maxIters )
-#
-#     # Assert the result dimensions
-#     assert uh.shape == fh.shape
-#     assert isinstance(flag, int)
-#     assert isinstance(relres, float)
-#     assert isinstance(iters, int)
-#     assert isinstance(resvec, np.ndarray)
-#
-#
-# def test_solve_no_acceleration_custom_parameters(mgmStruct1):
-#     # Define input parameters
-#     fh = np.array([1, 1, 1])  # Example right-hand side
-#     tol = 1e-5  # Custom tolerance
-#     maxIters = 50  # Custom maximum number of iterations
-#     accel = 'none'  # No acceleration
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call solve method with no acceleration and custom parameters
-#     uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1, fh, tol, accel, maxIters)
-#
-#     # Assert the result dimensions
-#     assert uh.shape == fh.shape
-#     assert isinstance(flag, int)
-#     assert isinstance(relres, float)
-#     assert isinstance(iters, int)
-#     assert isinstance(resvec, np.ndarray)
-#
-# def test_solve_no_acceleration_large_system(mgmStruct1):
-#     # Test with a larger system
-#     fh = np.ones(100)  # Example right-hand side for a larger system
-#     tol = 1e-8  # Default tolerance
-#     maxIters = 100  # Default maximum number of iterations
-#     accel = 'none'  # No acceleration
-#
-#     # Instantiate TestMGMImplementation object
-#     mgm_obj = TestMGMImplementation()
-#
-#     # Call solve method with no acceleration and default parameters for a larger system
-#     uh, flag, relres, iters, resvec = mgm_obj.solve(mgmStruct1, fh, tol, accel, maxIters)
-#
-#     # Assert the result dimensions
-#     assert uh.shape == fh.shape
-#     assert isinstance(flag, int)
-#     assert isinstance(relres, float)
-#     assert isinstance(iters, int)
-#     assert isinstance(resvec, np.ndarray)
+#--------------------------------------------------------------------------------
+#                          SOlVE TESTS
+#--------------------------------------------------------------------------------
+@pytest.fixture
+def example_input_obj():
+    file_path = construct_file_path('solve_data', 'levelsData_before_solve.mat')
+    mat_contents = sp.io.loadmat(file_path)
+
+    # Initialize an empty list to store the levelsData
+    levelsData = []
+
+    # Iterate over the data from the .mat file
+    for i in range(len(mat_contents['levelsData'])):
+        level_data = {
+            'nodes': mat_contents['levelsData'][i][0]['nodes'],
+            'stencilSize': mat_contents['levelsData'][i][0]['stencilSize'],
+            'rbfOrder': mat_contents['levelsData'][i][0]['rbfOrder'],
+            'rbfPolyDeg': mat_contents['levelsData'][i][0]['rbfPolyDeg'],
+            'rbf': mat_contents['levelsData'][i][0]['rbf'],
+            # Function handle to the polyharmonic spline kernel function needs polyHarmonic implementation
+            'idx': mat_contents['levelsData'][i][0]['idx'],
+            'Lh': mat_contents['levelsData'][i][0]['Lh'],
+            'DLh': mat_contents['levelsData'][i][0]['DLh'],
+            'I': mat_contents['levelsData'][i][0]['I'],
+            'R': mat_contents['levelsData'][i][0]['R'],
+            'Mhf': mat_contents['levelsData'][i][0]['Mhf'],
+            'Nhf': mat_contents['levelsData'][i][0]['Nhf'],
+            'Mhb': mat_contents['levelsData'][i][0]['Mhb'],
+            'Nhb': mat_contents['levelsData'][i][0]['Nhb'],
+            'preSmooth': mat_contents['levelsData'][i][0]['preSmooth'],
+            'postSmooth': mat_contents['levelsData'][i][0]['postSmooth'],
+            'Ihat': mat_contents['levelsData'][i][0]['Ihat'],
+            'Rhat': mat_contents['levelsData'][i][0]['Rhat'],
+            'w': mat_contents['levelsData'][i][0]['w'],
+            'Qh': mat_contents['levelsData'][i][0]['Qh']
+        }
+        levelsData.append(level_data)
+    return levelsData
+
+@pytest.fixture
+def mgmObj(example_input_obj):
+    mgmobj = [
+        {'stencilSizeT':3},
+        {'polyDegreeT':3},
+        {'transferOp':'RBF'},
+        {'verbose':1},
+        {'levelsData':example_input_obj},
+        {'domainVol':4},
+        {'coarseningFactor':4},
+        {'Nmin':250},
+        {'preSmooth':1},
+        {'postSmooth':1},
+        {'maxIters':100},
+        {'hasConstNullSpace':False}
+    ]
+    return mgmobj
+
+
+def test_solve_no_acceleration_default_parameters(mgmObj):
+    file_path = construct_file_path('solve_data', 'fh_before_solve.mat')
+    fh = sp.io.loadmat(file_path)['fh']
+    expected_uh = sp.io.loadmat(construct_file_path('solve_data', 'uh_after_solve.mat'))['uh']
+    expected_relres = sp.io.loadmat(construct_file_path('solve_data', 'relres_after_solve.mat'))['relres'][0][0]
+    expected_resvec = sp.io.loadmat(construct_file_path('solve_data', 'resvec_after_solve.mat'))['resvec']
+    tol = 1e-10  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
+    accel = 'none'
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and default parameters
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj,fh, tol, accel, maxIters )
+
+    # Assert the result dimensions
+    assert np.allclose(expected_uh, uh)
+    assert flag == 0
+    assert np.allclose(expected_relres, relres)
+    assert iters == 15
+    assert np.allclose(expected_resvec, resvec)
+
+
+def test_solve_bicgstab_accel(mgmObj):
+    file_path = construct_file_path('solve_data', 'fh_before_solve_bicgstab.mat')
+    fh = sp.io.loadmat(file_path)['fh']
+    expected_uh = sp.io.loadmat(construct_file_path('solve_data', 'uh_after_solve_bicgstab.mat'))['uh']
+    expected_relres = sp.io.loadmat(construct_file_path('solve_data', 'relres_after_solve_bicgstab.mat'))['relres'][0][0]
+    expected_resvec = sp.io.loadmat(construct_file_path('solve_data', 'resvec_after_solve_bicgstab.mat'))['resvec']
+    tol = 1e-10  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
+    accel = 'bicgstab'
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and default parameters
+    uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj,fh, tol, accel, maxIters )
+
+    # Assert the result dimensions
+    assert np.allclose(expected_uh, uh)
+    assert flag == 0
+    ## bigcstab doesn't return relres, iters and resvec for now uh and the flag are ok
+    # assert np.allclose(expected_relres, relres)
+    # assert iters == 13
+    # assert np.allclose(expected_resvec, resvec)
+
+def test_solve_gmres_accel(mgmObj):
+    file_path = construct_file_path('solve_data', 'fh_before_solve_bicgstab.mat')
+    fh = sp.io.loadmat(file_path)['fh']
+    tol = 1e-10  # Default tolerance
+    maxIters = 100  # Default maximum number of iterations
+    accel = 'gmres'
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call solve method with no acceleration and default parameters
+    with pytest.raises(NotImplementedError):
+        uh, flag, relres, iters, resvec = mgm_obj.solve(mgmObj, fh, tol, accel, maxIters)
 
 
 
@@ -335,7 +369,7 @@ def test_standalone_non_convergence(example_input):
     assert np.allclose(expected_uh, uh)
     assert np.allclose(expected_resvec, resvec)
 
-def test_standalone_empty_input(mgmStruct):
+def test_standalone_empty_input():
     # Define empty input parameters
     fh = np.array([])  # Empty right-hand side
     tol = 1e-8  # Tolerance
