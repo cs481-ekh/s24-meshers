@@ -1,7 +1,12 @@
 #!/bin/bash
+g++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` src/pymgm_test/utils/cyCodeBase/bindings.cpp src/pymgm_test/utils/cyCodeBase/cySampleElim.h -o src/pymgm_test/utils/cyCodeBase/elim`python3-config --extension-suffix`
 
+ls
 # Exit script on error
 set -e
+# Compile 'elim' library
+
+
 
 # Lint with flake8
 flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
