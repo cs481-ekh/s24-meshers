@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <array>
 #include "cyCodeBase/cySampleElim.h"
 #include "cyCodeBase/cyPointCloud.h"
 #include "cyCodeBase/cyPoint.h"
@@ -21,30 +22,15 @@ public:
     // Want to coarsen to a vector array of (x,y) points coarsened to size outputPointCount
     // Calls wse.eliminate() which loops and eliminates one point at a time until outputPointCount is reached
     // return the vector array
-    std::vector <std::array<double, 2>> Coarsen(vector <cy::Point2d> points, int outputPointCount, float area) {
+    std::vector <std::array<double, 2>> Coarsen(std::vector <cy::Point2d> points, int outputPointCount, float area) {
+
       // check arguments
-      if (points.getType() != ArrayType::DOUBLE || points.getType() == ArrayType::COMPLEX_DOUBLE)
-      {
-        throw std::invalid_argument("Input points must be scalar double ");
-      }
-
-      if (outputPointCount.getType() != ArrayType::DOUBLE)
-      {
-        throw std::invalid_argument("outputPointCount must be int ????? ");
-      }
-
-      TypedArray<double> doubleArray = std::move(points);
-      int N = doubleArray.getNumberOfElements()/2;
-      if (N <= outputPointCount) {
+      size_t N = points.size();
+      if (static_cast<int>(N) <= outputPointCount) {
         throw std::invalid_argument("Output size must be less than input to coarsen");
       }
 
-      std::vector <cy::Point2d> inputPoints(N);
-      int idx = 0;
-      for (idx = 0; idx < N; idx++) {
-        inputPoints[idx].x = doubleArray[idx][0];
-        inputPoints[idx].y = doubleArray[idx][1];
-      }
+      uint idx = 0;
 
       // create weighted elimination object
       cy::WeightedSampleElimination<Point2d, double, 2, int> wse;
@@ -56,7 +42,7 @@ public:
       float d_max = 2 * wse.GetMaxPoissonDiskRadius(2, outputPoints.size(), area);
 
       bool isProgressive = true;
-      wse.Eliminate(inputPoints.data(), inputPoints.size(),outputPoints.data(), outputPoints.size(), isProgressive, d_max, 2);
+      wse.Eliminate(points.data(), points.size(),outputPoints.data(), outputPoints.size(), isProgressive, d_max, 2);
 
       Nc = outputPoints.size();
 
