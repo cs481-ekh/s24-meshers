@@ -7,7 +7,7 @@ using namespace cy;
 PYBIND11_MODULE(PcCoarsen, m) {
     py::class_<PcCoarsen2D>(m, "PcCoarsen2D")
         .def(py::init<>())
-        .def("coarsen", &PcCoarsen2D::Coarsen);
+        .def("Coarsen", &PcCoarsen2D::Coarsen);
 }
 
 
