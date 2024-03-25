@@ -2,6 +2,7 @@
 import PcCoarsen
 import numpy as np
 
+# Generate base case for poisson
 def poisson_gen_base(n):
     h = 2 / (n+1)
     m = n

@@ -23,13 +23,7 @@ typedef unsigned int uint;
 class PcCoarsen2D {
 public:
 
-    std::vector <std::array<double, 2>> Coarsen(std::vector <cy::Point2d> inputPoints, int outputPointCount, float area) {
-
-      // check arguments? can check arguments in python
-//      size_t N = inputPoints.size();
-//      if (static_cast<int>(N) <= outputPointCount) {
-//        throw std::invalid_argument("Output size must be less than input to coarsen");
-//      }
+    std::vector <std::array<double, 2>> Coarsen(std::vector <std::array<double, 2>> inputPoints, int outputPointCount, float area) {
 
 
       // create weighted elimination object
