@@ -26,7 +26,6 @@ public:
     std::vector <std::array<double, 2>> Coarsen(std::vector <std::array<double, 2>> inputPoints, int outputPointCount, float area) {
 
       //Cast inputPoints from type array <double, 2> to type vector< Point2d >
-      TypedArray<double> doubleArray = std::move(inputs[0]);
       int N = inputPoints.size();
       std::vector< cy::Point2d > cyInputPoints(N);
       for ( int i = 0; i < N; i++ ) {

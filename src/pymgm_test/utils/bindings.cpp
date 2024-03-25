@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>  // Include the stl header for vector conversion
 #include "PcCoarsen2D.cpp"
 
 namespace py = pybind11;
