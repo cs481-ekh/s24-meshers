@@ -25,6 +25,14 @@ public:
 
     std::vector <std::array<double, 2>> Coarsen(std::vector <std::array<double, 2>> inputPoints, int outputPointCount, float area) {
 
+      //Cast inputPoints from type array <double, 2> to type vector< Point2d >
+      TypedArray<double> doubleArray = std::move(inputs[0]);
+      int N = inputPoints.size();
+      std::vector< cy::Point2d > cyInputPoints(N);
+      for ( int i = 0; i < N; i++ ) {
+        cyInputPoints[i].x = inputPoints[i][0];
+        cyInputPoints[i].y = inputPoints[i][1];
+      }
 
       // create weighted elimination object
       cy::WeightedSampleElimination<Point2d, double, 2, int> wse;
@@ -35,7 +43,7 @@ public:
       float d_max = 2 * wse.GetMaxPoissonDiskRadius(2, outputPoints.size(), area);
 
       bool isProgressive = true;
-      wse.Eliminate(inputPoints.data(), inputPoints.size(),outputPoints.data(), outputPoints.size(), isProgressive, d_max, 2);
+      wse.Eliminate(cyInputPoints.data(), cyInputPoints.size(),outputPoints.data(), outputPoints.size(), isProgressive, d_max, 2);
       
       // will the data types break here? unsure if outputPoints from eliminate() is of type int or (uint) ? 
       outputPointCount = outputPoints.size();  // reassign just to be sure? Could eliminite() ever be off by one?
