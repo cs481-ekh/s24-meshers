@@ -240,6 +240,6 @@ class mgm(ABC):
     from ._standalonecon import standalonecon
     from ._afuncon import afuncon
     @abstractmethod
-    def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
+    def buildInterpOp(self, fineLevelStruct, coarseLevelStruct, interpMethod):
         pass
 
