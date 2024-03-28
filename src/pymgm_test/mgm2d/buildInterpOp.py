@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial import KDTree
 from src.pymgm_test.utils.polynomialBasis2D import poly_basis
+from scipy.io import loadmat
+
 # fineLevelStruct is LevelsData
 # coarseLevelStruct is LevelsData 
 # interp is Boolean   
@@ -35,7 +37,7 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
 
     ZM = np.zeros((dimPoly,dimPoly))
     pe = np.zeros((dimPoly,1))
-    pe[1][0] = 1
+    pe[0][0] = 1
 
     Wf = 2
 
@@ -48,9 +50,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         xx = x[:,0]
         yy = x[:,1]
 
-        #print("Tokat")
-        #print(xx)
-        #print(yy)
         xxt = xx.T  # Transpose
         yyt = yy.T
 
@@ -62,7 +61,11 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         stencilRad = 1
         diffxe / stencilRad
         P, _ = poly_basis(diffxe / stencilRad,rbfPolyDeg)
-        print(P)
+        
+        if interp:
+            pass
+        else:
+            pass
 
         #print(x)
         #print()
@@ -83,31 +86,29 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         #print(re2)
         #print()
 
-    return
+    return None
 
 #Example
 fineLevelStruct = {}
 coarseLevelStruct = {}
 
-coarseLevelStruct['nodes'] = np.array([
-    [1,1],[0,1],[2,2],[2,1],[4,3],[3,1]
-])
+coarseLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/coarseparams.mat')['cond'] 
 coarseLevelStruct['idx'] = None
+coarseLevelStruct['rbfOrder'] = 0
+coarseLevelStruct['rbfPolyDeg'] = 0
+coarseLevelStruct['rbf'] = None
+#print(fineLevelStruct['nodes'].shape)
+coarseLevelStruct['stencilSize'] = 3
 
-coarseLevelStruct['rbfOrder'] = 3
-coarseLevelStruct['rbfPolyDeg'] = 3
-coarseLevelStruct['rbf'] = 3
 
 #print(coarseLevelStruct['nodes'].shape)
 fineLevelStruct['stencilSize'] = 3
-
-fineLevelStruct['nodes'] = np.array([
-    [1,1],[0,1],[2,2],[2,1],[4,3],[3,1],[3,5],[2,0],[4,1],[0,4],[0,3],[2,3]
-])
+fineLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/fineparams.mat')['find'] 
+#np.array([[1,1],[0,1],[2,2],[2,1],[4,3],[3,1],[3,5],[2,0],[4,1],[0,4],[0,3],[2,3]])
 fineLevelStruct['idx'] = None
 
-#print(fineLevelStruct['nodes'].shape)
-coarseLevelStruct['stencilSize'] = 3
+
+print(coarseLevelStruct['nodes'])
 
 buildInterpOp(fineLevelStruct, coarseLevelStruct, True)
 
