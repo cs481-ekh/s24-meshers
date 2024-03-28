@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import KDTree
 from src.pymgm_test.utils.polynomialBasis2D import poly_basis
 from scipy.io import loadmat
+from src.pymgm_test.utils.polyHarmonic import polyHarmonic
 
 # fineLevelStruct is LevelsData
 # coarseLevelStruct is LevelsData 
@@ -48,12 +49,16 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         j = idx[i]
         x = cnodes[j,:] # selects rows with indicies in j (e.g. if j=[2 3] it will select 2nd and 3rd rows)
         xx = x[:,0]
+
+        xx = xx.reshape(-1,1)
         yy = x[:,1]
+        yy = yy.reshape(-1,1)
 
         xxt = xx.T  # Transpose
         yyt = yy.T
 
-        rd2 = (xx - xxt) ** 2 + (yy - yyt) ** 2
+        rd2 = (xx - xxt)**2 + (yy - yyt)**2
+        #print(rd2)
 
         diffxe = x - xe[None, :]
         re2 = np.sum(diffxe**2, axis=1)
@@ -62,30 +67,25 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         diffxe / stencilRad
         P, _ = poly_basis(diffxe / stencilRad,rbfPolyDeg)
         
+        # interp = 1
         if interp:
+            
             pass
+
+        # interp = 0
         else:
-            pass
-
-        #print(x)
-        #print()
-        #print(xe)
-        #print()
-        #print(xx)
-        #print()
-        #print(yy)
-        #print()
-        #print(xxt)
-        #print()
-        #print(yyt)
-        #print()
-        #print(rd2)
-        #print()
-        #print(diffxe)
-        #print()
-        #print(re2)
-        #print()
-
+            A = rbf(rd2,rbfOrder,1)
+            P = P.reshape(1,-1)
+            A = np.concatenate((A, P), axis = 0)
+            P = P.reshape(-1, 1)
+            last_col = np.concatenate((P, ZM), axis = 0)
+            A = np.concatenate((A, last_col), axis = 1)
+            b = (rbf(re2,rbfOrder,1)).reshape(-1, 1)
+            b = np.concatenate((b, pe), axis = 0)
+            wghts = np.linalg.solve(A, b)
+            # Good so far
+            #print(b)
+            #print(wghts)
     return None
 
 #Example
@@ -96,7 +96,7 @@ coarseLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/coarseparams.mat')['c
 coarseLevelStruct['idx'] = None
 coarseLevelStruct['rbfOrder'] = 0
 coarseLevelStruct['rbfPolyDeg'] = 0
-coarseLevelStruct['rbf'] = None
+coarseLevelStruct['rbf'] = polyHarmonic
 #print(fineLevelStruct['nodes'].shape)
 coarseLevelStruct['stencilSize'] = 3
 
@@ -110,6 +110,6 @@ fineLevelStruct['idx'] = None
 
 print(coarseLevelStruct['nodes'])
 
-buildInterpOp(fineLevelStruct, coarseLevelStruct, True)
+buildInterpOp(fineLevelStruct, coarseLevelStruct, False)
 
 #print(np.array([np.arange(6)] * 13).shape)
