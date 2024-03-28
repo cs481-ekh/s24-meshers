@@ -89,6 +89,7 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         
         interp_wghts[:,i] = wghts[0:nd].flatten()
         col_index[:,i] = j
+        
 
     fineLevelStruct['I'] = coo_matrix(interp_wghts(row_index, col_index), shape=(nf, nc))
     return fineLevelStruct
