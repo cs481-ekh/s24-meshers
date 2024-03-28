@@ -1,6 +1,5 @@
 #!/bin/bash
-g++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` src/pymgm_test/utils/cyCodeBase/bindings.cpp src/pymgm_test/utils/cyCodeBase/cySampleElim.h -o src/pymgm_test/utils/cyCodeBase/elim`python3-config --extension-suffix`
-
+g++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` src/pymgm_test/utils/bindings.cpp src/pymgm_test/utils/PcCoarsen2D.cpp -o src/pymgm_test/utils/PcCoarsen`python3-config --extension-suffix`
 ls
 # Exit script on error
 set -e
