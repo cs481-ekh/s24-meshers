@@ -3,6 +3,7 @@ from scipy.spatial import KDTree
 from src.pymgm_test.utils.polynomialBasis2D import poly_basis
 from scipy.io import loadmat
 from src.pymgm_test.utils.polyHarmonic import polyHarmonic
+from scipy.sparse import coo_matrix # sparse() matlab equivalent, for generating sparse matrices
 
 # fineLevelStruct is LevelsData
 # coarseLevelStruct is LevelsData 
@@ -16,15 +17,14 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
 
     nd = coarseLevelStruct['stencilSize']
 
-    row_index = np.array([np.arange(nf)] * nd)
-    col_index = row_index
+    row_index = np.array([np.arange(nf)] * nd, dtype=float)
+    col_index = np.array(row_index, dtype=float)
     interp_wghts = row_index
 
     tree = KDTree(cnodes)
     # use Faiss if dataset becomes too large where classic CPU computation is impractical
 
     # _ is the distance between nearest neighbors (not used in the Matlab code)
-    # stencilSize is (hard-coded as) 3, though subject to change (just a note for myself)
     _, idx = tree.query(fnodes, k=nd)
     fineLevelStruct['nodes'] = fnodes
     fineLevelStruct['idx'] = idx
@@ -58,7 +58,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         yyt = yy.T
 
         rd2 = (xx - xxt)**2 + (yy - yyt)**2
-        #print(rd2)
 
         diffxe = x - xe[None, :]
         re2 = np.sum(diffxe**2, axis=1)
@@ -66,7 +65,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         stencilRad = 1
         diffxe / stencilRad
         P, _ = poly_basis(diffxe / stencilRad,rbfPolyDeg)
-        #print(re2)
         wghts = None
 
         # interp = 1
@@ -89,9 +87,13 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
             b = np.concatenate((b, pe), axis = 0)
             wghts = np.linalg.solve(A, b)
         
-    return wghts
+        interp_wghts[:,i] = wghts[0:nd].flatten()
+        col_index[:,i] = j
 
-#Example
+    fineLevelStruct['I'] = coo_matrix(interp_wghts(row_index, col_index), shape=(nf, nc))
+    return fineLevelStruct
+
+#Example parameters 
 fineLevelStruct = {}
 coarseLevelStruct = {}
 
@@ -109,9 +111,7 @@ fineLevelStruct['stencilSize'] = 3
 fineLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/fineparams.mat')['find'] 
 #np.array([[1,1],[0,1],[2,2],[2,1],[4,3],[3,1],[3,5],[2,0],[4,1],[0,4],[0,3],[2,3]])
 fineLevelStruct['idx'] = None
-
-
-print(coarseLevelStruct['nodes'])
+fineLevelStruct['I'] = None
 
 buildInterpOp(fineLevelStruct, coarseLevelStruct, True)
 
