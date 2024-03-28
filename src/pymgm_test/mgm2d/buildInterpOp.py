@@ -24,7 +24,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
     # use Faiss if dataset becomes too large where classic CPU computation is impractical
 
     # _ is the distance between nearest neighbors (not used in the Matlab code)
-    # stencilSize is (hard-coded as) 3, though subject to change (just a note for myself)
     _, idx = tree.query(fnodes, k=nd)
     fineLevelStruct['nodes'] = fnodes
     fineLevelStruct['idx'] = idx
@@ -58,7 +57,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         yyt = yy.T
 
         rd2 = (xx - xxt)**2 + (yy - yyt)**2
-        #print(rd2)
 
         diffxe = x - xe[None, :]
         re2 = np.sum(diffxe**2, axis=1)
@@ -66,7 +64,6 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         stencilRad = 1
         diffxe / stencilRad
         P, _ = poly_basis(diffxe / stencilRad,rbfPolyDeg)
-        #print(re2)
         wghts = None
 
         # interp = 1
@@ -91,7 +88,7 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         
     return wghts
 
-#Example
+#Example parameters 
 fineLevelStruct = {}
 coarseLevelStruct = {}
 
