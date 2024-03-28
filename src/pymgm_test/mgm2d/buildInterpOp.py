@@ -66,11 +66,16 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
         stencilRad = 1
         diffxe / stencilRad
         P, _ = poly_basis(diffxe / stencilRad,rbfPolyDeg)
-        
+        #print(re2)
+        wghts = None
+
         # interp = 1
         if interp:
-            
-            pass
+            W = np.exp((-Wf*re2)/(1 + re2))**2
+            W = W.reshape(-1,1)
+            Q, R = np.linalg.qr(W * P)
+            r_pe = np.linalg.solve(R, pe)
+            wghts = W * Q * r_pe
 
         # interp = 0
         else:
@@ -83,10 +88,8 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
             b = (rbf(re2,rbfOrder,1)).reshape(-1, 1)
             b = np.concatenate((b, pe), axis = 0)
             wghts = np.linalg.solve(A, b)
-            # Good so far
-            #print(b)
-            #print(wghts)
-    return None
+        
+    return wghts
 
 #Example
 fineLevelStruct = {}
@@ -110,6 +113,6 @@ fineLevelStruct['idx'] = None
 
 print(coarseLevelStruct['nodes'])
 
-buildInterpOp(fineLevelStruct, coarseLevelStruct, False)
+buildInterpOp(fineLevelStruct, coarseLevelStruct, True)
 
 #print(np.array([np.arange(6)] * 13).shape)
