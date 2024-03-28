@@ -10,7 +10,7 @@ import os
 class TestMGMImplementation(mgm):
     __test__ = False
     pass
-    def buildInterOp(self, fineLevelStruct, coarseLevelStruct):
+    def buildInterpOp(self, fineLevelStruct, coarseLevelStruct, interpMethod):
         pass
 
 

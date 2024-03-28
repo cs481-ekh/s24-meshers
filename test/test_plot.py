@@ -1,6 +1,6 @@
 import os
 import scipy as sp
-from src.pymgm_test.mgm2d.plot import plot
+from src.pymgm_test.mgm2d.mgm2d import mgm2D
 import pytest
 
 def construct_file_path(folder_name, file_name):
@@ -65,9 +65,8 @@ def mgmObj(example_input_obj):
     return mgmobj
 
 def test_plot(mgmObj):
-    # data = example_input_obj()
-    # obj = mgmObj(data)
-    h = plot(mgmObj)
+    mgm_obj = mgm2D()
+    h = mgm_obj.plot(mgmObj)
 
     assert True
 
