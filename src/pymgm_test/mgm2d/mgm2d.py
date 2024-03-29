@@ -10,6 +10,7 @@ class mgm2D(mgm):
         self.polyDegT = 0
         self.transferOp = 'RBF'
         self.verbose = 1
+        self.coarsening_factor = 4
 
         if Lh is not None and x is not None and domArea is not None and hasConstNullspace is not None and verbose is not None:
             self.obj = self.constructor(Lh, x, domArea, hasConstNullspace, verbose)
