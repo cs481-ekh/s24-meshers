@@ -384,3 +384,31 @@ def test_standalone_empty_input():
     # uh, flag, relres, iters, resvec = mgm_obj.standalone(levelsData, fh, tol, max_iters, uh, smooths)
     with pytest.raises(IndexError):
          mgm_obj.standalone(np.array([]), fh, tol, max_iters, uh, smooths)
+
+
+
+#######################################################################################################################
+#Constraint Functions TESTS
+#######################################################################################################################
+#--------------------------------------------------------------------------------
+#                          AFUNCON TESTS
+#--------------------------------------------------------------------------------
+
+def test_afuncon(mgmObj):
+    # Example mgmStruct
+    mgm_struct = mgmObj
+
+    # Example input vector
+    uh_before = sp.io.loadmat(construct_file_path('afuncon_data', 'afuncon_uh_before.mat'))['uh']
+
+    # Instantiate TestMGMImplementation object
+    mgm_obj = TestMGMImplementation()
+
+    # Call afuncon method with mgmStruct
+    result = mgm_obj.afuncon(uh_before, mgm_struct[4]['levelsData'])
+
+    # Perform manual matrix-vector multiplication for validation
+    expected_result = sp.io.loadmat(construct_file_path('afuncon_data', 'afuncon_uh_after.mat'))['uh']
+
+    # Assert that the result matches the expected result
+    assert np.array_equal(result, expected_result)
