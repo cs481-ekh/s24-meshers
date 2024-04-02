@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 from src.pymgm_test.mgm.mgm import mgm
+from src.pymgm_test.utils import PcCoarsen
+
 
 class mgm2D(mgm):
     def __init__(self, Lh=None, x=None, domArea=None, hasConstNullspace=None, verbose=None):
@@ -47,9 +50,42 @@ class mgm2D(mgm):
 
     def constructor(self, Lh, x, domArea, hasConstNullspace, verbose):
         # Actual construction here
+        #Compute number of levels
+        p = math.floor(math.log(N / Nmin) / math.log(coarseningFactor));
+
+        levelsData = []
+
+        # Create level data for each level
+        for _ in range(p + 1):
+            level_data = {
+                'nodes': [],
+                'stencilSize': self.stencilSizeT,
+                'rbfOrder': self.rbfOrderT,
+                'rbfPolyDeg': self.polyDegT,
+                'rbf': self.rbf,
+                'idx': [],
+                'Lh': [],
+                'DLh': [],
+                'I': [],
+                'R': [],
+                'Mhf': [],
+                'Nhf': [],
+                'Mhb': [],
+                'Nhb': [],
+                'preSmooth': self.preSmooth,
+                'postSmooth': self.postSmooth,
+                'Ihat': 1,
+                'Rhat': 1,
+                'w': [],
+                'Qh': 0
+            }
+            levelsData.append(level_data)
+
+
+
         obj = {}
         obj['coarseningFactor'] = 4
-        # Do further initialization here
+
         return obj
 
 
