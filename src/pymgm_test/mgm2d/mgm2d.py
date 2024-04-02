@@ -85,6 +85,7 @@ class mgm2D(mgm):
 
         obj = {}
         obj['coarseningFactor'] = 4
+        obj['levelsData'] = levelsData
 
         return obj
 
