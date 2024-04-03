@@ -4,6 +4,13 @@ from src.pymgm_test.utils.polynomialBasis2D import poly_basis
 from scipy.io import loadmat
 from src.pymgm_test.utils.polyHarmonic import polyHarmonic
 from scipy.sparse import coo_matrix # sparse() matlab equivalent, for generating sparse matrices
+from scipy.sparse import csc_matrix
+import scipy.sparse as sp
+
+# not necessary
+from tqdm import tqdm
+from scipy.sparse import csr_matrix
+
 
 # fineLevelStruct is LevelsData
 # coarseLevelStruct is LevelsData 
@@ -17,15 +24,16 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
 
     nd = coarseLevelStruct['stencilSize']
 
-    row_index = np.array([np.arange(nf)] * nd, dtype=float)
-    col_index = np.array(row_index, dtype=float)
-    interp_wghts = row_index
+    row_index = np.array([np.arange(nf)] * nd)
+    col_index = np.array(row_index)
+    interp_wghts = np.array(row_index, dtype=float)
 
     tree = KDTree(cnodes)
     # use Faiss if dataset becomes too large where classic CPU computation is impractical
 
     # _ is the distance between nearest neighbors (not used in the Matlab code)
     _, idx = tree.query(fnodes, k=nd)
+
     fineLevelStruct['nodes'] = fnodes
     fineLevelStruct['idx'] = idx
 
@@ -42,11 +50,11 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
 
     Wf = 2
 
-    nf = 1
-    for i in range(nf):
+    for i in tqdm(range(nf)):
         xe = fnodes[i]
         #print(xe)
         j = idx[i]
+        print(j)
         x = cnodes[j,:] # selects rows with indicies in j (e.g. if j=[2 3] it will select 2nd and 3rd rows)
         xx = x[:,0]
 
@@ -86,12 +94,25 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
             b = (rbf(re2,rbfOrder,1)).reshape(-1, 1)
             b = np.concatenate((b, pe), axis = 0)
             wghts = np.linalg.solve(A, b)
-        
-        interp_wghts[:,i] = wghts[0:nd].flatten()
+            
+        interp_wghts[:,i] = wghts[0:nd].flatten() # turns to 1d array
         col_index[:,i] = j
-        
+        #print(col_index)
 
-    fineLevelStruct['I'] = coo_matrix(interp_wghts(row_index, col_index), shape=(nf, nc))
+    row_index1d = row_index.reshape(-1).flatten()
+    col_index1d = col_index.reshape(-1).flatten()
+    interp_wghts1d = interp_wghts.reshape(1,-1).flatten()
+
+    fineLevelStruct['I'] = csr_matrix((interp_wghts1d, (row_index1d, col_index1d)), shape=(nf, nc), dtype=np.double)
+
+    # Sort the entries by column, and then by row within each column
+    #sorted_indices = np.lexsort((I_coo.row, I_coo.col))
+
+    # Apply the sorting to row, column, and data
+    #sorted_row = I_coo.row[sorted_indices]
+    #sorted_col = I_coo.col[sorted_indices]
+    #sorted_data = I_coo.data[sorted_indices]
+
     return fineLevelStruct
 
 #Example parameters 
@@ -106,6 +127,9 @@ coarseLevelStruct['rbf'] = polyHarmonic
 #print(fineLevelStruct['nodes'].shape)
 coarseLevelStruct['stencilSize'] = 3
 
+sparsemt = loadmat('src/pymgm_test/mgm2d/sparsemat.mat')['spr']
+#print(sparsemt)
+
 
 #print(coarseLevelStruct['nodes'].shape)
 fineLevelStruct['stencilSize'] = 3
@@ -113,7 +137,6 @@ fineLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/fineparams.mat')['find'
 #np.array([[1,1],[0,1],[2,2],[2,1],[4,3],[3,1],[3,5],[2,0],[4,1],[0,4],[0,3],[2,3]])
 fineLevelStruct['idx'] = None
 fineLevelStruct['I'] = None
+fineLevelStruct['g'] = None
 
-buildInterpOp(fineLevelStruct, coarseLevelStruct, True)
-
-#print(np.array([np.arange(6)] * 13).shape)
+fineLevelStruct = buildInterpOp(fineLevelStruct, coarseLevelStruct, False)
