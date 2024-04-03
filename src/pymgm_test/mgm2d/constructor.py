@@ -2,6 +2,7 @@ import numpy as np
 
 from scipy.spatial import cKDTree
 from src.pymgm_test.utils.polyHarmonic import polyHarmonic  # You need to import util module or provide implementation for it
+import time
 
 def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True):
     # Size of the stencil for the interpolation operator
@@ -83,9 +84,9 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         domArea = N * np.mean(d[:, 1]) ** 2
 
     self.domainVol = domArea
-    import numpy as np
 
-    xc = [None] * (p + 1)
+    stime = time.time()
+    xc = np.empty(p + 1, dtype=object)
     Nc = np.zeros(p + 1)
 
     Nc[0] = N
@@ -100,7 +101,8 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         Nc[j] = xc[j].shape[0]
 
     if verbose:
-        # print('Done building coarse node sets. Construction time = %1.2e\n' % etime)
+        etime = time.time() - stime
+        print('Done building coarse node sets. Construction time = %1.2e\n' % etime)
 
     # Initialize the structure for the various levels
     levelsData = []
@@ -132,7 +134,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
     if verbose:
         print('Building Interp/Restriction operators, #levels=%d...' % (p + 1))
 
-
+    stime = time.time()
     levelsData[0]['Lh'] = Lh
     levelsData[0]['w'] = np.ones(N)
 
@@ -141,6 +143,21 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         levelsData[j]['w'] = np.dot(levelsData[j]['R'], levelsData[j - 1]['w'])
 
     if verbose:
-        # print('Done. Transfer operator build time %1.2e\n' % etime)
+        etime = time.time() - stime
+        print('Done. Transfer operator build time %1.2e\n' % etime)
 
-    return levelsData
+    obj =  [
+        {'stencilSizeT':stencilSizeT},
+        {'polyDegreeT':polyDegT},
+        {'transferOp':transferOp},
+        {'verbose':verbose},
+        {'levelsData':levelsData},
+        {'domainVol':self.domainVol},
+        {'coarseningFactor':coarseningFactor},
+        {'Nmin':self.Nmin},
+        {'preSmooth':preSmooth},
+        {'postSmooth':postSmooth},
+        {'maxIters':self.maxIters},
+        {'hasConstNullSpace':hasConstNullspace},
+    ]
+    return obj
