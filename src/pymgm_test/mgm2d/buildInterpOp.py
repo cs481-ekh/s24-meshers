@@ -4,9 +4,6 @@ from src.pymgm_test.utils.polynomialBasis2D import poly_basis
 from src.pymgm_test.utils.polyHarmonic import polyHarmonic
 from scipy.sparse import csr_matrix
 
-# not necessary
-from tqdm import tqdm # used for checking progress (wrap it around a range())
-
 
 # fineLevelStruct is LevelsData
 # coarseLevelStruct is LevelsData 
