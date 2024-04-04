@@ -1,15 +1,11 @@
 import numpy as np
 from scipy.spatial import KDTree
 from src.pymgm_test.utils.polynomialBasis2D import poly_basis
-from scipy.io import loadmat
 from src.pymgm_test.utils.polyHarmonic import polyHarmonic
-from scipy.sparse import coo_matrix # sparse() matlab equivalent, for generating sparse matrices
-from scipy.sparse import csc_matrix
-import scipy.sparse as sp
+from scipy.sparse import csr_matrix
 
 # not necessary
-from tqdm import tqdm
-from scipy.sparse import csr_matrix
+from tqdm import tqdm # used for checking progress (wrap it around a range())
 
 
 # fineLevelStruct is LevelsData
@@ -50,11 +46,10 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
 
     Wf = 2
 
-    for i in tqdm(range(nf)):
+    for i in range(nf):
         xe = fnodes[i]
         #print(xe)
         j = idx[i]
-        print(j)
         x = cnodes[j,:] # selects rows with indicies in j (e.g. if j=[2 3] it will select 2nd and 3rd rows)
         xx = x[:,0]
 
@@ -103,40 +98,8 @@ def buildInterpOp(fineLevelStruct, coarseLevelStruct, interp):
     col_index1d = col_index.reshape(-1).flatten()
     interp_wghts1d = interp_wghts.reshape(1,-1).flatten()
 
+    # Sparse matrix
     fineLevelStruct['I'] = csr_matrix((interp_wghts1d, (row_index1d, col_index1d)), shape=(nf, nc), dtype=np.double)
-
-    # Sort the entries by column, and then by row within each column
-    #sorted_indices = np.lexsort((I_coo.row, I_coo.col))
-
-    # Apply the sorting to row, column, and data
-    #sorted_row = I_coo.row[sorted_indices]
-    #sorted_col = I_coo.col[sorted_indices]
-    #sorted_data = I_coo.data[sorted_indices]
+    print(csr_matrix)
 
     return fineLevelStruct
-
-#Example parameters 
-fineLevelStruct = {}
-coarseLevelStruct = {}
-
-coarseLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/coarseparams.mat')['cond'] 
-coarseLevelStruct['idx'] = None
-coarseLevelStruct['rbfOrder'] = 0
-coarseLevelStruct['rbfPolyDeg'] = 0
-coarseLevelStruct['rbf'] = polyHarmonic
-#print(fineLevelStruct['nodes'].shape)
-coarseLevelStruct['stencilSize'] = 3
-
-sparsemt = loadmat('src/pymgm_test/mgm2d/sparsemat.mat')['spr']
-#print(sparsemt)
-
-
-#print(coarseLevelStruct['nodes'].shape)
-fineLevelStruct['stencilSize'] = 3
-fineLevelStruct['nodes'] = loadmat('src/pymgm_test/mgm2d/fineparams.mat')['find'] 
-#np.array([[1,1],[0,1],[2,2],[2,1],[4,3],[3,1],[3,5],[2,0],[4,1],[0,4],[0,3],[2,3]])
-fineLevelStruct['idx'] = None
-fineLevelStruct['I'] = None
-fineLevelStruct['g'] = None
-
-fineLevelStruct = buildInterpOp(fineLevelStruct, coarseLevelStruct, False)
