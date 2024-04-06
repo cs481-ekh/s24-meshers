@@ -6,7 +6,7 @@ import time
 # from scipy.sparse.csgraph import symrcm
 from scipy.sparse.csgraph import reverse_cuthill_mckee as rcm
 from src.pymgm_test.mgm2d.buildInterpOp import buildInterpOp
-from src.pymgm_test.utils.PcCoarsen2D import PcCoarsen2D
+from src.pymgm_test.utils import PcCoarsen
 
 def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True):
     # Size of the stencil for the interpolation operator
@@ -16,12 +16,12 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
     # Type of transfer operator
     transferOp = self.transferOp
     # Coarsening factor for the coarser levels
-    coarseningFactor = self.coarseningFactor
+    coarseningFactor = self.coarsening_factor
     # Minimum size of the coarsest level
     Nmin = self.Nmin
     # Number of pre and post smooths
-    preSmooth = self.preSmooth
-    postSmooth = self.postSmooth
+    preSmooth = self.pre_smooth
+    postSmooth = self.post_smooth
 
 
 
@@ -101,7 +101,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         Nc[j] = int(N / coarseningFactor ** (j - 1))
         if verbose:
             print('Building coarse node set Nc=%d' % Nc[j])
-        xc[j] = PcCoarsen2D(xc[j - 1], Nc[j], domArea)
+        xc[j] = PcCoarsen.PcCoarsen2D(xc[j - 1], Nc[j], domArea)
         Nc[j] = xc[j].shape[0]
 
     if verbose:
