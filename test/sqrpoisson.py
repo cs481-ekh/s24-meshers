@@ -22,8 +22,10 @@ def squarepoissond(n):
 
     # Make up a solution
     uexact = np.sin(np.pi * x[:, 0] ** 2) * np.cos(np.pi * x[:, 1] ** 2)
+    uexact = uexact.reshape((-1, 1))
     # Compute the right hand side for this solution
-    fh = Lh @ uexact
+    fh = Lh.dot(uexact)
+    fh = fh.reshape((-1, 1))
 
     # The domain is a square with side length 2 so the area (or volume) is 4
     vol = 4
