@@ -3,7 +3,7 @@ import numpy as np
 import math
 from scipy.spatial import cKDTree
 from src.pymgm_test.mgm.mgm import mgm
-from src.pymgm_test.utils import PcCoarsen
+# from src.pymgm_test.utils import PcCoarsen
 
 
 class mgm2D(mgm):
@@ -118,6 +118,7 @@ class mgm2D(mgm):
         obj['levelsData'] = levelsData
 
         return obj
+    # from src.pymgm_test.mgm2d.constructor import constructor
 
 
     def buildInterpOp(self,fineLevelStruct, coarseLevelStruct, interpMethod):

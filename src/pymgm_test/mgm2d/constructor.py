@@ -1,9 +1,12 @@
 import numpy as np
 
 from scipy.spatial import cKDTree
-from src.pymgm_test.utils.polyHarmonic import polyHarmonic  # You need to import util module or provide implementation for it
+from src.pymgm_test.utils.polyHarmonic import polyHarmonic
 import time
-from scipy.sparse.csgraph import symrcm
+# from scipy.sparse.csgraph import symrcm
+from scipy.sparse.csgraph import reverse_cuthill_mckee as rcm
+from src.pymgm_test.mgm2d.buildInterpOp import buildInterpOp
+from src.pymgm_test.utils.PcCoarsen2D import PcCoarsen2D
 
 def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True):
     # Size of the stencil for the interpolation operator
@@ -98,7 +101,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         Nc[j] = int(N / coarseningFactor ** (j - 1))
         if verbose:
             print('Building coarse node set Nc=%d' % Nc[j])
-        # xc[j] = PcCoarsen2D(xc[j - 1], Nc[j], domArea)
+        xc[j] = PcCoarsen2D(xc[j - 1], Nc[j], domArea)
         Nc[j] = xc[j].shape[0]
 
     if verbose:
@@ -152,7 +155,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         levelsData[j]['Lh'] = levelsData[j]['R'] @ levelsData[j - 1]['Lh'] @ levelsData[j - 1]['I']
 
         # Re-order nodes to get nice banded structure in the operators
-        id = symrcm(levelsData[j]['Lh'])
+        id = rcm(levelsData[j]['Lh'])
         levelsData[j]['Lh'] = levelsData[j]['Lh'][id, id]
         levelsData[j - 1]['I'] = levelsData[j - 1]['I'][:, id]
         levelsData[j]['R'] = levelsData[j]['R'][id, :]
