@@ -98,11 +98,13 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
 
 
     for j in range(1, p + 1):
-        Nc[j] = int(N / coarseningFactor ** (j - 1))
+        Nc[j] = int(N / (coarseningFactor ** (j)))
         if verbose:
             print('Building coarse node set Nc=%d' % Nc[j])
-        xc[j] = PcCoarsen.PcCoarsen2D(xc[j - 1], Nc[j], domArea)
-        Nc[j] = xc[j].shape[0]
+        xc[j] = PcCoarsen.PcCoarsen2D().Coarsen(xc[j - 1], int(Nc[j]), float(domArea))
+
+
+        Nc[j] = len(xc[j])
 
     if verbose:
         etime = time.time() - stime
@@ -152,7 +154,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         levelsData[j]['R'] = levelsData[j - 1]['I'].T
 
         # Galerkin coarse level operator
-        levelsData[j]['Lh'] = levelsData[j]['R'] @ levelsData[j - 1]['Lh'] @ levelsData[j - 1]['I']
+        [j]['Lh'] = levelsData[j]['R'] @ levelsData[j - 1]['Lh'] @ levelsData[j - 1]['I']
 
         # Re-order nodes to get nice banded structure in the operators
         id = rcm(levelsData[j]['Lh'])
