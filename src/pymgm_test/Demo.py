@@ -1,5 +1,5 @@
 from src.pymgm_test.mgm2d.mgm2d import mgm2D
-from src.pymgm_test.mgm2d.squarepoisson import squarepoissond
+from src.pymgm_test.utils.sqrpoisson import squarepoissond
 # Create the square poisson problem
 Lh, x, vol, fh, uexact = squarepoissond(50)
 
