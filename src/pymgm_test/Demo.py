@@ -7,7 +7,7 @@ Lh, x, vol, fh, uexact = squarepoissond(50)
 mgm = mgm2D(Lh,x,vol,False,1)
 
 # Plot the coarse levels
-mgm.plot(mgm.mgmobj)
+mgm.plot(mgm.obj)
 
 # Run the MGM solver
 uh,flag,relres,iters,resvec = mgm.solve(mgm.obj,fh,1e-10,'none',100)
