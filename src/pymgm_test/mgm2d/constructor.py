@@ -7,6 +7,7 @@ import time
 from scipy.sparse.csgraph import reverse_cuthill_mckee as rcm
 from src.pymgm_test.mgm2d.buildInterpOp import buildInterpOp
 from src.pymgm_test.utils import PcCoarsen
+import scipy.sparse as sp
 
 def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True):
     # Size of the stencil for the interpolation operator
@@ -101,7 +102,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         Nc[j] = int(N / (coarseningFactor ** (j)))
         if verbose:
             print('Building coarse node set Nc=%d' % Nc[j])
-        xc[j] = PcCoarsen.PcCoarsen2D().Coarsen(xc[j - 1], int(Nc[j]), float(domArea))
+        xc[j] = np.array(PcCoarsen.PcCoarsen2D().Coarsen(xc[j - 1], int(Nc[j]), float(domArea)))
 
 
         Nc[j] = len(xc[j])
@@ -154,31 +155,38 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         levelsData[j]['R'] = levelsData[j - 1]['I'].T
 
         # Galerkin coarse level operator
-        [j]['Lh'] = levelsData[j]['R'] @ levelsData[j - 1]['Lh'] @ levelsData[j - 1]['I']
+        levelsData[j]['Lh'] = levelsData[j]['R'] @ levelsData[j - 1]['Lh'] @ levelsData[j - 1]['I']
+
+        # Convert 'Lh' to CSC format
+        levelsData[j]['Lh'] = sp.csc_matrix(levelsData[j]['Lh'])
 
         # Re-order nodes to get nice banded structure in the operators
         id = rcm(levelsData[j]['Lh'])
-        levelsData[j]['Lh'] = levelsData[j]['Lh'][id, id]
+        levelsData[j]['Lh'] = levelsData[j]['Lh'][id][:, id]
         levelsData[j - 1]['I'] = levelsData[j - 1]['I'][:, id]
         levelsData[j]['R'] = levelsData[j]['R'][id, :]
         levelsData[j]['nodes'] = levelsData[j]['nodes'][id, :]
 
         # Smoother - Gauss-Seidel
         # Forward GS
-        levelsData[j - 1]['Mhf'] = np.tril(levelsData[j - 1]['Lh'])
-        levelsData[j - 1]['Nhf'] = -np.triu(levelsData[j - 1]['Lh'], 1)
+        # Forward GS
+        levelsData[j - 1]['Mhf'] = sp.tril(levelsData[j - 1]['Lh'], k=0).tocsr()
+        levelsData[j - 1]['Nhf'] = -sp.triu(levelsData[j - 1]['Lh'], k=1).tocsr()
+
         # Backward GS
-        levelsData[j - 1]['Mhb'] = np.triu(levelsData[j - 1]['Lh'])
-        levelsData[j - 1]['Nhb'] = -np.tril(levelsData[j - 1]['Lh'], -1)
+        levelsData[j - 1]['Mhb'] = sp.triu(levelsData[j - 1]['Lh'], k=0).tocsr()
+        levelsData[j - 1]['Nhb'] = -sp.tril(levelsData[j - 1]['Lh'], k=-1).tocsr()
 
         # Constraint for Poisson problem from the Galerkin operator
         levelsData[j]['w'] = levelsData[j]['R'] @ levelsData[j - 1]['w']
 
         if verbose:
             # Print diagnostics
-            sparsity = 1 - np.count_nonzero(levelsData[j]['Lh']) / np.size(levelsData[j]['Lh'])
+            # Print diagnostics
+            sparsity = 1 - np.count_nonzero(levelsData[j]['Lh'].toarray()) / np.size(levelsData[j]['Lh'].toarray())
             print('level={}, unknowns={}, non-zeros={}, sparsity={:.3f}'.format(j - 1, Nc[j],
-                                                                                np.count_nonzero(levelsData[j]['Lh']),
+                                                                                np.count_nonzero(
+                                                                                    levelsData[j]['Lh'].toarray()),
                                                                                 sparsity))
 
     if hasConstNullspace:
@@ -186,9 +194,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         levelsData[p + 1]['Lh'] = np.block([[levelsData[p + 1]['Lh'], levelsData[p + 1]['w'][..., None]],
                                             [levelsData[p + 1]['w'], 0]])
 
-    # Coarse-level solver: direct solve using numpy's linalg solver
-    # In Python, you can directly use numpy's linalg solver without needing to create a decomposition object
-    levelsData[p + 1]['DLh'] = levelsData[p + 1]['Lh']
+    levelsData[p ]['DLh'] = levelsData[p]['Lh']
 
 
     if verbose:
@@ -206,7 +212,7 @@ def constructor(self,Lh, x, domArea=None, hasConstNullspace=False, verbose=True)
         {'Nmin':self.Nmin},
         {'preSmooth':preSmooth},
         {'postSmooth':postSmooth},
-        {'maxIters':self.maxIters},
+        {'maxIters':self.max_iters},
         {'hasConstNullSpace':hasConstNullspace},
     ]
     return obj
