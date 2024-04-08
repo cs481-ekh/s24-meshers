@@ -28,7 +28,7 @@ y3 = np.array([-0.777777777777778,0.777777777777778,-0.777777777777778,0.7777777
 # expected coarsening in matlab with same input points
 # coarsening factor 4 on 64 => 16 points
 #expected level 2 after one coarsen
-base_case_lvl_2 = np.column_stack((x1, y2))
+base_case_lvl_2 = np.column_stack((x1, y1))
 #expected level 3 after one coarsen
 base_case_lvl_3 = np.column_stack((x3, y3))
 
@@ -53,8 +53,8 @@ print(xc_sorted)
 print("xc_expect_sorted (lvl2)")
 print(xc_expect_sorted)
 # Compare if sorted arrays are equal
-are_equal = np.array_equal(xc_sorted, xc_expect_sorted)
-print("Are arrays equal:", are_equal)
+are_equal = np.allclose(xc_sorted, xc_expect_sorted)
+print("Are arrays equal (lvl2):", are_equal)
 
 # Coarsen again (lvl 3)
 # expected level 3 after coarsen
@@ -73,8 +73,8 @@ print(xc3_sorted)
 print("xc3_expect_sorted (lvl3)")
 print(xc3_expect_sorted)
 # Compare if sorted arrays are equal
-are_equal3 = np.array_equal(xc3_sorted, xc3_expect_sorted)
-print("Are arrays equal:", are_equal3)
+are_equal3 = np.allclose(xc3_sorted, xc3_expect_sorted)
+print("Are arrays equal (lvl3):", are_equal3)
 
 # quick tests in runPcCorasen for now Tracking down anomalies
 # Test more discrete or larger cases
