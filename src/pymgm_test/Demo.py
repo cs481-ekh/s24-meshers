@@ -1,5 +1,6 @@
 from src.pymgm_test.mgm2d.mgm2d import mgm2D
 from src.pymgm_test.utils.sqrpoisson import squarepoissond
+import numpy as np
 # Create the square poisson problem
 Lh, x, vol, fh, uexact = squarepoissond(50)
 
@@ -11,7 +12,7 @@ mgm.plot(mgm.obj)
 
 # Run the MGM solver
 uh,flag,relres,iters,resvec = mgm.solve(mgm.obj,fh,1e-10,'none',100)
-
+# np.set_printoptions(threshold=np.inf)
 print("solution: ",uh)
 print("\n")
 print("convergence flag: ",flag)
