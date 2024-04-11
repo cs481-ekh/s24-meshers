@@ -1,5 +1,6 @@
 from src.pymgm_test.mgm2d.mgm2d import mgm2D
-from ...test.sqrpoisson import squarepoissond
+from src.pymgm_test.utils.sqrpoisson import squarepoissond
+import numpy as np
 # Create the square poisson problem
 Lh, x, vol, fh, uexact = squarepoissond(50)
 
@@ -7,18 +8,18 @@ Lh, x, vol, fh, uexact = squarepoissond(50)
 mgm = mgm2D(Lh,x,vol,False,1)
 
 # Plot the coarse levels
-mgm.plot(mgm.mgmobj)
+mgm.plot(mgm.obj)
 
 # Run the MGM solver
 uh,flag,relres,iters,resvec = mgm.solve(mgm.obj,fh,1e-10,'none',100)
-
-print(uh)
-print("/n")
-print(flag)
-print("/n")
-print(relres)
-print("/n")
-print(iters)
-print("/n")
-print(resvec)
-print("/n")
+# np.set_printoptions(threshold=np.inf)
+print("solution: ",uh)
+print("\n")
+print("convergence flag: ",flag)
+print("\n")
+print("relres: ",relres)
+print("\n")
+print("iterations: ",iters)
+print("\n")
+print("residual vector: \n",resvec)
+print("\n")
