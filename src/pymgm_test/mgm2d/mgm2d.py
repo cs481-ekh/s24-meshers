@@ -198,7 +198,7 @@ class mgm2D(mgm):
             levelsData[j]['nodes'] = xc[j]
 
             # Build interpolation operator
-            levelsData[j - 1] = buildInterpOp(levelsData[j - 1], levelsData[j], interpMethod)
+            levelsData[j - 1] = mgm.buildInterpOp(levelsData[j - 1], levelsData[j], interpMethod)
 
             # Restriction is transpose of interpolation
             levelsData[j]['R'] = levelsData[j - 1]['I'].T
