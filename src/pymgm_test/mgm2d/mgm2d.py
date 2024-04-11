@@ -265,7 +265,7 @@ class mgm2D(mgm):
         ]
         return obj
 
-    def buildInterpOp(self,fineLevelStruct, coarseLevelStruct, interpMethod):
+    def buildInterpOp(self,fineLevelStruct, coarseLevelStruct, interp):
         """
         Build interpolation operator for MGM2D.
 
@@ -274,8 +274,8 @@ class mgm2D(mgm):
                 Fine level structure
             coarseLevelStruct : dict
                 Coarse level structure
-            interpMethod : str
-                Interpolation method ('RBF' or 'GMLS')
+            interp : Boolean
+                Interpolation method (False for 'RBF' or True for 'GMLS')
 
         Returns:
             fineLevelStruct : dict
