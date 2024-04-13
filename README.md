@@ -1,4 +1,4 @@
-# BSU CS481 Capstone pyMGM
+# BSU CS481 Capstone - pyMGM
 
 
 ![publish workflow](https://github.com/cs481-ekh/s24-meshers/actions/workflows/py-publish.yml/badge.svg) ![build workflow](https://github.com/cs481-ekh/s24-meshers/actions/workflows/build.yml/badge.svg) ![test workflow](https://github.com/cs481-ekh/s24-meshers/actions/workflows/lint-test.yml/badge.svg)
@@ -21,6 +21,7 @@ suited for problems arising in computational science and engineering.
 The MGM method offers a powerful approach to solve and precondition linear systems resulting from meshfree discretizations of elliptic equations.
 It encompasses algorithms for both 2D surfaces embedded in 3D space and 2D/3D Euclidean domains with boundaries. This Python implementation extends
 the capabilities of the original MGM method for 2D surfaces, allowing users to leverage its functionality within the Python ecosystem.
+For quick reference on the current features and limitations of pyMGM, please see the [Quick Reference](#quick-reference) section below.
 
 ## Features
 - Current package structure designed for easy installation for testing purposes, compatible with PyPI test environment. 
@@ -61,77 +62,78 @@ The inputs for MGM are simple:
 - The $N\times N$ matrix $L_h$ stored as a _sparse_ MATLAB matrix `Lh` 
 - The point cloud $X$ (or nodes) that was used in the construction of `Lh`, stored as a $N\times d$ MATLAB matrix `X`, where $d$ is the dimension of (embedding) space. For nodal FE discretizations, $X$ would be the quadrature nodes over the elements of the mesh (without repeats). 
 - The area/volume of the underlying domain $\Omega$ of the PDE, stored as a scalar value `domainVol`
+- boolean - hasConstNullSpace (not yet implemented for value of True) if the system has a constant null space
+- boolean - verbose as a flag indicating whether diagnostics should be printed
 
-With these three components, one first sets up the MGM method, which consists of computing the point sets and discrete operators on the various coarser levels:
+With these three components, one first sets up the MGM method, which consists of computing the point sets and discrete operators on the various coarser levels
+
+After importing the mgm2D class from  src.pymgm_test.mgm2d.mgm2d within the project an instance of the class can be created by calling:
+```
+# For a 2D Euclidean domain:
+mgm = mgm2D(Lh,X,domainVol, False, 1)
+```
+ 
+Note:
+-  This step only needs to be done once for a given `Lh`.
+
+The following code is then used to solve the system for a given right hand side `fh` using the default acceleration method of 'none'
+```
+uh,flag,relres,iters,resvec = mgmobj.solve(mgm.obj,fh,tol,'none');
+```
+
+Note: 
+- The parameters for tolerance, acceleration method, and max iterations are optional values a call using user defined values for these parameters may look like: 
 
 ```
-% For a 2D surface embedded in 3D space
-mgmobj = mgm2ds(Lh,X,domainVol)
-```
-or
-```
-% For a 2D Euclidean domain:
-mgmobj = mgm2d(Lh,X,domainVol)
-```
-or *(IMPLEMENTED BUT NOT YET TESTED)*
-```
-% For a 3D Euclidean domain: 
-mgmobj = mgm3d(Lh,X,domainVol)
-```
-Note that this step only needs to be done once for a given `Lh`.
-
-The following code is then used to solve the system for a given right hand side `fh` using MGM as a (left) preconditioner for GMRES
-```
-[uh,flag,relres,iters,resvec] = mgmobj.solve(fh,tol,'gmres');
+uh,flag,relres,iters,resvec = mgmobj.solve(mgm.obj,fh,tol,'none', True, 100);
 ```
 See the help text of `mgm.solve` for a description of the outputs and other optional input arguments.
 
 
-### Problems with a one dimensional nullspace
+### Problems with a one dimensional nullspace (NOT YET IMPLEMENTED)
 For PDEs such as the surface Poisson problem or Poisson problems on Euclidean domains with pure Neumann boundary conditions the matrix $L_h$ will have a one dimensional nullspace corresponding to constant vectors.  In these cases where there is a one-dimensional nullspace, it is necessary to alter the above construction procedure.  For example, for the surface problem one would instead do:
 ```
 % For a 2D surface embedded in 3D space where Lh has a one dimensional nullspace (e.g. surface Poisson problem)
-mgmobj = mgm2ds(Lh,X,domainVol,true)
+mgmobj = mgm2D(Lh,X,domainVol,True, 1)
 ```
 Again see the help text of `mgm2ds`, `mgm2d`, or `mgm3d` for a description of other optional input arguments.
 
-## Demo using `util.gallery`
-The `util.gallery` function contains some example problems with matrices, points, right hand sides, and exact solutions already computed. Below are some examples using this with MGM
+## Demo using `util.squarepoisson`
+The `util.squarepoisson` function generates a square poisson distribution problem with matrices, points, right hand sides, and exact solutions already computed
+from a given n for an $N\times N$ matrix. For the current implementation of pyMGM n &ge; 50 is recommended. <br><br>
+Below is an example using this with pyMGM
+```
+Lh, x, vol, fh, uexact = squarepoissond(50)
+# Set-up MGM2D for this problem
+mgm = mgm2D(Lh,x,vol,False,1)
+# Solve the linear system using pyMGM with default acceleration of 'none'
+uh,flag,relres,iters,resvec = mgm.solve(mgm.obj,fh,1e-10,'none',100)
+```
+To optionally create a plot of the solution, the following code can be used:
+```
+import matplotlib.pyplot as plt
 
-### Example 1
-Poisson problem with Dirichlet boundary conditions on a key hole domain.
-The discretization is based on finite elements with p=3 degree polynomials and was
-was computed using [FEniCS](https://fenicsproject.org).
-```
-[Lh,x,domVol,fh,uexact] = util.gallery('keyholepoissond');
-% Set-up MGM2D for this problem
-mgmobj = mgm2d(Lh,x,domVol,false,1);
-% Solve the linear system using MGM accelerated with BiCGSTAB
-[uh,flag,relres,iters,resvec] = mgmobj.solve(fh,1e-10,'bicgstab',100);
-% Plot the solution
-scatter3(x(:,1),x(:,2),uh,20,uh,'.'), view(2)
+# Scatter plot of the solution
+plt.figure()
+plt.scatter(x[:, 0], x[:, 1], c=uh, cmap='viridis', s=20)
+plt.colorbar(label='Solution')
+plt.title('Scatter plot of the solution')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
 ```
 
-### Example 2
-Poisson problem with Neumann boundary conditions on the unit disk.
-The discretization is again based on finite elements with p=3 degree polynomials and was
-was computed using [FEniCS](https://fenicsproject.org).
-```
-[Lh,x,domVol,fh,uexact] = util.gallery('diskpoissonn');
-% Set-up MGM2D for this problem with Neumann boundary conditions
-mgmobj = mgm2d(Lh,x,domVol,true,1);
-% Solve the linear system using MGM accelerated with GMRES
-[uh,flag,relres,iters,resvec] = mgmobj.solve(fh,1e-10,'gmres',100);
-% Remove the Lagrange multiplier for enforcing a discrete zero mean solution
-uh = uh(1:end-1);
-% Plot the solution
-scatter3(x(:,1),x(:,2),uh,20,uh,'.'), view(2)
-```
+## Quick Reference: Not Yet Implemented Features: <a name="quick-reference"></a>
+- The `hasConstNullSpace` parameter for a value of True is not yet implemented.  The MGM method is designed to handle systems with a one-dimensional nullspace, but this feature is not yet implemented in the current version of pyMGM.
+- 2Ds and 3Ds are not yet implemented.  The current version of pyMGM only supports 2D Euclidean domains.
+- pip install for the package not yet available.  The current version of pyMGM must be built from source.
+- BIGCSTAB acceleration method has an implementation but currently does not return relres, iters, resvec. Only the solution and convergence flag are returned.
+- GMRES acceleration not yet implemented.
 
 ## References:
 
-[1] G. B. Wright, A. M. Jones, and V. Shankar. MGM: A meshfree geometric multilevel method for systems arising from elliptic equations on point cloud surfaces. _SIAM J. Sci. Comput.,_ 45, A312-A337 (2023) ([arxiv](http://arxiv.org/abs/2204.06154), [journal](https://epubs.siam.org/doi/10.1137/22M1490338))
-<br><br>
+[1] G. B. Wright, A. M. Jones, and V. Shankar . MGM: A meshfree geometric multilevel method for systems arising from elliptic equations on point cloud surfaces. _SIAM J. Sci. Comput.,_ 45, A312-A337 (2023) ([arxiv](http://arxiv.org/abs/2204.06154), [journal](https://epubs.siam.org/doi/10.1137/22M1490338))
+<br><br><br><br>
 <div style="text-align: center;">
     <img src="docs/sdp-logo.png" alt="ScreenShot" style="width: 80px; cursor: pointer; display: block; margin: 0 auto;">
     <p>This website/app was created for a <br>
