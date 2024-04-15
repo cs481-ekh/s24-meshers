@@ -1,1 +1,1 @@
-# TODO - Github page
+# pyMGM
