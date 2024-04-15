@@ -1,1 +1,1 @@
-# pyMGM
+# pyMGM team meshers
