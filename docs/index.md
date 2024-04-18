@@ -34,5 +34,5 @@ There is a function to visualize the different levels of coarseness called plot(
 of the data. In the projects README file code is provided to plot the solution of the MGM algorithm. Plots of the levels of data look like:
 ![img.png](img.png)
 ![img_1.png](img_1.png)
-The solution is depicted as a scatter plot with an example of a solution using a square poisson distrubution looking like:
+The solution is depicted as a scatter plot with an example of a solution using a square poisson distribution looking like:
 ![img_2.png](img_2.png)
