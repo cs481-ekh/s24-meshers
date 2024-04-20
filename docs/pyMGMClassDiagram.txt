@@ -13,6 +13,10 @@ class mgm2D_py {
 	domArea
 	stencilSize
 	LevelsData < interpolator<> , restrictor<> , PointClouds<> > 
+	uh  
+	relres
+	iters
+	resvec
     +init()
 	+constructor()
 	+buildInterpOp()
@@ -60,7 +64,7 @@ class polynomialBasis2D_py {
 
 Demo_py -u-> sqrpoisson  : Create Sample Data
 Demo_py -r-> mgm2D_py : Build mgm2D object\n with sqrpoisson input data
-mgm2D_py -u-|> mgm_py : implements
+mgm2D_py -u-|> mgm_py : inherits
 mgm2D_py  -r-> PcCoarsen2D_cpp : pyBind linking to C++
 PcCoarsen2D_cpp -r-> cyCodeBase_cpp : call cyCodeBase \n to coarsen levels
 mgm2D_py --> polynomialBasis2D_py 
