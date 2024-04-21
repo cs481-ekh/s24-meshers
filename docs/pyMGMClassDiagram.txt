@@ -1,0 +1,76 @@
+@startuml
+
+abstract class mgm_py {
+    +solve()
+    +afun()
+	+standalone()
+	+multilevel()
+}
+
+class mgm2D_py {
+	Lh
+	x
+	domArea
+	stencilSize
+	LevelsData < interpolator<> , restrictor<> , PointClouds<> > 
+	uh  
+	relres
+	iters
+	resvec
+    +init()
+	+constructor()
+	+buildInterpOp()
+	+plot()
+}
+
+class sqrpoisson {
+	Lh
+	x
+	domVol
+	fh
+	uexact
+}
+
+class Demo_py {
+
+}
+
+
+
+class PcCoarsen2D_cpp {
+	vector < Point2d > inputPoints
+	vector < Point2d > outputPoints
+	Nc = outputPoints.size
+
+	+Coarsen()
+}
+
+
+
+class cyCodeBase_cpp {
+	Point Cloud 
+	Heap
+	+WeightedSampleElimination()
+
+
+}
+
+
+class polynomialBasis2D_py {
+	
+}
+
+
+
+Demo_py -u-> sqrpoisson  : Create Sample Data
+Demo_py -r-> mgm2D_py : Build mgm2D object\n with sqrpoisson input data
+mgm2D_py -u-|> mgm_py : inherits
+mgm2D_py  -r-> PcCoarsen2D_cpp : pyBind linking to C++
+PcCoarsen2D_cpp -r-> cyCodeBase_cpp : call cyCodeBase \n to coarsen levels
+mgm2D_py --> polynomialBasis2D_py 
+
+
+
+ 
+
+@enduml
