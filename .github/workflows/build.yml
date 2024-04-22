@@ -1,4 +1,8 @@
-name: Build and Publish
+# This workflow builds the current repository into a distributable package.
+# For more information on using GitHub Actions for building and testing Python projects,
+# visit: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
+
+name: Build 
 
 on:
   push:
@@ -22,31 +26,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install bumpversion build twine
 
-    # I wasn't able to find a way to override our current branch protection
-    # but essentially that is the issue why automation is unable to update the version number 
-    # each time
-
-    #- name: Configure Git user
-    #  run: |
-    #    git config --local user.email "action@github.com"
-    #    git config --local user.name "GitHub Action"  
-
-    #- name: Bump patch version
-    #  run: bumpversion --verbose patch
-
-    #- name: Push changes
-    #  run: |
-    #    git push --quiet https://$ {{ secrets.GH_PAT }}@github.com/$ {{ github.repository }} HEAD:$ {{ github.ref }}
-    #    git push --tags --quiet https://$ {{ secrets.GH_PAT }}@github.com/$ {{ github.repository }} HEAD:$ {{ github.ref }}
-    #  env:
-    #    GH_PAT: $ {{ secrets.GH_PAT }}
-
+# Run bash script to build the package
     - name: Build Package
       run: |
         ./build.sh
 
-    #- name: Publish Package
-    #  env:
-    #    PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-    #  run: |
-    #    twine upload dist/* --verbose --non-interactive --repository testpypi --username __token__ --password $PYPI_API_TOKEN

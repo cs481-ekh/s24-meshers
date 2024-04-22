@@ -1,0 +1,69 @@
+The Python Package Index, or PyPI, is a repository for Python packages that allows users to upload, modify, and install packages using pip.  Currently, the pyMGM project is on a "tester" version of PyPI called TestPyPI.  This is a "beta" packaging index intended for incomplete or test versions of packages. 
+
+The instructions below will guide you through on how to transfer the current Python Project from TestPyPI over to the real index (PyPI)
+
+You need to follow the following instructions to be able to publish Python Packages to the packaging index. This will enable anyone (or a select number of users in case of a private package) to pip install your package. 
+
+
+1. Ensure pip is installed by running:
+
+> pip --version
+pip 24.0 from C:\Python312\Lib\site-packages\pip (python 3.12)
+
+Example output: pip 24.0 from C:\Python312\Lib\site-packages\pip (python 3.12)
+Note: This applies to both Windows, Mac, and Linux.If pip is not installed, follow the installation instructions for your OS.
+
+If pip is not installed, follow the instructions on this link below to install it, for your OS.
+
+https://pip.pypa.io/en/stable/installation/
+
+2. If you are new to packaging Python projects, this might be a good start:
+
+https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+3. You will need to register for an account at https://pypi.org/.  
+
+4. Once registered, go to your account settings. 
+
+5. Navigate to 'Two factor authentication (2FA)' and choose a 2FA method (An authentication Application like Google Duo, or a Security Device such as a USB key supporting 2FA)
+
+6. Go to 'API tokens' and create a new API token. This will be used for publishing your package to pyPI.
+
+7. In your GitHub project, navigate to 'Settings'.
+
+8. Under Settings, find 'Secrets' or 'Secrets and variables'. Click on that.
+
+9. Click on the pencil icon next to 'PYPI_API_TOKEN' to update the secret with the token you generated. Copy/paste the new token's contents into the secret.
+
+10. From the main repository, navigate to '.github/workflows/py-publish.yml'.
+
+11. In the script, find and edit the line responsible for uploading the package:
+
+        twine upload dist/* --verbose --non-interactive --repository testpypi --username __token__ --password $PYPI_API_TOKEN
+
+Remove '--repository testpypi' as we are no longer uploading to TestPyPI (by default, twine will upload to PyPI).
+
+as we are no longer uploading to TestPyPI (by default, twine will upload to PyPI).
+
+12. You may wish to navigate to the 'pyproject.toml' configuration file in the main directory, and change the name of the project. Currently it is:
+
+name = "pymgm-test"
+
+You may also wish to update the first version number you aim to publish as well (right after that)
+
+
+Optional:
+
+13. To verify the pyPI index was set up correctly you can:
+
+a. Enter a new command with whatever tag name you want (ensure you are in the repository presumably locally):
+
+> git tag v0.x.x
+
+b. Then push your changes to GitHub
+
+> git push --tags
+
+c. Visit your package page on PyPI to verify that it was published successfully.
+
+
