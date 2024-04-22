@@ -132,7 +132,7 @@ class mgm2D(mgm):
         p = int(np.floor(np.log(N / Nmin) / np.log(coarseningFactor)))
 
         if verbose:
-            print('Building coarse node sets, N=%d, levels=%d...\n', N, p + 1)
+            print('Building coarse node sets, N=%d, levels=%d...\n' %(N, p + 1))
 
         if computeDomArea:
             tree = cKDTree(x)
@@ -198,7 +198,7 @@ class mgm2D(mgm):
             levelsData[j]['nodes'] = xc[j]
 
             # Build interpolation operator
-            levelsData[j - 1] = mgm.buildInterpOp(levelsData[j - 1], levelsData[j], interpMethod)
+            levelsData[j - 1] = self.buildInterpOp(levelsData[j - 1], levelsData[j], interpMethod)
 
             # Restriction is transpose of interpolation
             levelsData[j]['R'] = levelsData[j - 1]['I'].T
