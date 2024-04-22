@@ -46,28 +46,30 @@ vol_float = float(vol)
 xc = PcCoarsen_2d.Coarsen(x,NC_int,vol_float)
 print("xc is: ")
 print(xc)
-xc_array = np.array(xc)
+#xc_array = np.array(xc)
 # Transpose the array to swap rows and columns
-xc_array_transposed = xc_array.T
+xy_column_vectors = np.reshape(xc, (-1, 2))
 
-xcx = xc_array_transposed[0]  # First column (x)
-xcy = xc_array_transposed[1]  # Second column (y)
-xc_reshaped = [xcx, xcy]
+xcx = xy_column_vectors[:, 0]  # First column (x)
+xcy = xy_column_vectors[:, 1]  # Second column (y)
+print("xcx is: ")
+print(xcx)
+print (" ")
 
+xc_reshaped = np.column_stack((xcx, xcy))
 
-#c_reshaped = np.reshape(xc, (-1, 2))
-#xc_reshaped = np.column_stack((xc, y1))
-print("x is: ")
+print("xc_reshaped is: ")
 print(xc_reshaped)
 print (" ")
 
-#
-# # Sort both arrays
-# xc_sorted = xc_reshaped[xc_reshaped[:, 0].argsort()]
-#
-#
-# print("xc sorted (lvl2)")
-# print(xc_sorted)
+
+# Sort both arrays
+
+
+xc_sorted2_indices = np.lexsort((xc_reshaped[:, 1], xc_reshaped[:, 0]))
+xc_sorted2 = xc_reshaped[xc_sorted2_indices]
+print("xc sorted2  lvl2")
+print(xc_sorted2)
 #
 # xc_expect_sorted = base_case_lvl_2[base_case_lvl_2[:, 0].argsort()]
 # print("xc_expect_sorted (lvl2)")
