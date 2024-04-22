@@ -21,6 +21,9 @@ NC = len(x) / 4
 
 # base case is first level
 base_case_lvl_1 = x
+print("x is: ")
+print(x)
+print (" ")
 x1 = np.array([-0.77777778, -0.33333333, -0.77777778, -0.77777778, -0.11111111, -0.77777778, 0.11111111, 0.77777778, 0.77777778, -0.33333333, 0.33333333, -0.33333333, 0.11111111, 0.77777778, 0.33333333, 0.77777778])
 y1 = np.array([-0.77777778, -0.77777778, -0.33333333, 0.77777778, -0.33333333, 0.33333333, -0.77777778, -0.33333333, -0.77777778, 0.11111111, -0.11111111, 0.77777778, 0.33333333, 0.33333333, 0.77777778, 0.77777778])
 x3 = np.array([0.777777777777778,-0.777777777777778,-0.777777777777778,0.777777777777778])
@@ -41,42 +44,62 @@ PcCoarsen_2d = PcCoarsen.PcCoarsen2D()
 NC_int = int(NC) # coarsen from 64 to 16
 vol_float = float(vol)
 xc = PcCoarsen_2d.Coarsen(x,NC_int,vol_float)
-xc_reshaped = np.reshape(xc, (-1, 2))
+print("xc is: ")
+print(xc)
+xc_array = np.array(xc)
+# Transpose the array to swap rows and columns
+xc_array_transposed = xc_array.T
+
+xcx = xc_array_transposed[0]  # First column (x)
+xcy = xc_array_transposed[1]  # Second column (y)
+xc_reshaped = [xcx, xcy]
 
 
-# Sort both arrays
-xc_sorted = np.sort(xc_reshaped, axis=1)
-xc_expect_sorted = np.sort(base_case_lvl_2, axis=1)
-print("xc sorted (lvl2)")
-print(xc_sorted)
+#c_reshaped = np.reshape(xc, (-1, 2))
+#xc_reshaped = np.column_stack((xc, y1))
+print("x is: ")
+print(xc_reshaped)
+print (" ")
 
-print("xc_expect_sorted (lvl2)")
-print(xc_expect_sorted)
-# Compare if sorted arrays are equal
-are_equal = np.allclose(xc_sorted, xc_expect_sorted)
-print("Are arrays equal (lvl2):", are_equal)
-
-# Coarsen again (lvl 3)
-# expected level 3 after coarsen
-NC3 = len(base_case_lvl_2) / 4
-NC3_int = int(NC3) # coarsen from 16 to 4
-xc3 = PcCoarsen_2d.Coarsen(xc,NC3_int,vol_float)
-xc3_reshaped = np.reshape(xc3, (-1, 2))
-
-
-# Sort both arrays (lvl 3)
-xc3_sorted = np.sort(xc3_reshaped, axis=1)
-xc3_expect_sorted = np.sort(base_case_lvl_3, axis=1)
-print("xc sorted (lvl3)")
-print(xc3_sorted)
-
-print("xc3_expect_sorted (lvl3)")
-print(xc3_expect_sorted)
-# Compare if sorted arrays are equal
-are_equal3 = np.allclose(xc3_sorted, xc3_expect_sorted)
-print("Are arrays equal (lvl3):", are_equal3)
-
-# quick tests in runPcCorasen for now Tracking down anomalies
-# Test more discrete or larger cases
-# keyholepoissond, diskpoisson with variuus sizes
-# Then Build all this out to /test/test_PC_coarsen.py
+#
+# # Sort both arrays
+# xc_sorted = xc_reshaped[xc_reshaped[:, 0].argsort()]
+#
+#
+# print("xc sorted (lvl2)")
+# print(xc_sorted)
+#
+# xc_expect_sorted = base_case_lvl_2[base_case_lvl_2[:, 0].argsort()]
+# print("xc_expect_sorted (lvl2)")
+# print(xc_expect_sorted)
+# # Compare if sorted arrays are equal
+# are_equal = np.allclose(xc_sorted, xc_expect_sorted)
+# print("Are arrays equal (lvl2):", are_equal)
+#
+# # Coarsen again (lvl 3)
+# # expected level 3 after coarsen
+# NC3 = len(base_case_lvl_2) / 4
+# NC3_int = int(NC3) # coarsen from 16 to 4
+# xc3 = PcCoarsen_2d.Coarsen(xc,NC3_int,vol_float)
+# xc3x = xc3[:, 0]  # First column (x)
+# xc3y = xc3[:, 1]  # Second column (y)
+# xc3_reshaped = [xc3x, xc3y];
+# #xc3_reshaped = np.reshape(xc3, (-1, 2))
+#
+#
+# # Sort both arrays (lvl 3)
+# xc3_sorted = xc3_reshaped[xc3_reshaped[:, 0].argsort()]
+# xc3_expect_sorted = base_case_lvl_3[base_case_lvl_3[:, 0].argsort()]
+# print("xc sorted (lvl3)")
+# print(xc3_sorted)
+#
+# print("xc3_expect_sorted (lvl3)")
+# print(xc3_expect_sorted)
+# # Compare if sorted arrays are equal
+# are_equal3 = np.allclose(xc3_sorted, xc3_expect_sorted)
+# print("Are arrays equal (lvl3):", are_equal3)
+#
+# # quick tests in runPcCorasen for now Tracking down anomalies
+# # Test more discrete or larger cases
+# # keyholepoissond, diskpoisson with variuus sizes
+# # Then Build all this out to /test/test_PC_coarsen.py
