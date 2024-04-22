@@ -4,6 +4,7 @@ The instructions below will guide you through on how to transfer the current Pyt
 
 You need to follow the following instructions to be able to publish Python Packages to the packaging index. This will enable anyone (or a select number of users in case of a private package) to pip install your package. 
 
+IMPORTANT NOTE:   Ensure the shared shared object files have been compiled. See the "Build instructions" in the README for more information.
 
 1. Ensure pip is installed by running:
 
